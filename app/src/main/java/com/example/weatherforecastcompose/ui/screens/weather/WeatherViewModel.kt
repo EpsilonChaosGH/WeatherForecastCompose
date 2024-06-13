@@ -1,149 +1,244 @@
 package com.example.weatherforecastcompose.ui.screens.weather
 
-import androidx.annotation.StringRes
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecastcompose.Const
-import com.example.weatherforecastcompose.data.network.WeatherRepository
+import com.example.weatherforecastcompose.R
+import com.example.weatherforecastcompose.ui.screens.IntentHandler
+import com.example.weatherforecastcompose.data.local.SettingsRepository
+import com.example.weatherforecastcompose.data.WeatherRepository
 import com.example.weatherforecastcompose.mappers.toResourceId
-import com.example.weatherforecastcompose.model.AirQuality
-import com.example.weatherforecastcompose.model.Air
 import com.example.weatherforecastcompose.model.City
 import com.example.weatherforecastcompose.model.Coordinates
-import com.example.weatherforecastcompose.model.Forecast
-import com.example.weatherforecastcompose.model.CurrentWeather
+import com.example.weatherforecastcompose.model.ErrorType
 import com.example.weatherforecastcompose.model.Settings
-import com.example.weatherforecastcompose.model.SupportedLanguage
-import com.example.weatherforecastcompose.model.Units
 import com.example.weatherforecastcompose.model.Weather
 import com.example.weatherforecastcompose.model.WeatherResult
-import com.example.weatherforecastcompose.model.WeatherType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val weatherRepository: WeatherRepository
-) : ViewModel() {
+    private val weatherRepository: WeatherRepository,
+    private val settings: SettingsRepository
+) : ViewModel(), IntentHandler<WeatherScreenIntent> {
 
-    private val _language = MutableStateFlow(SupportedLanguage.RUSSIAN)
-    private val _units = MutableStateFlow(Units.STANDARD)
 
-    private val _state = MutableStateFlow(WeatherUiState(isLoading = true))
-    val state: StateFlow<WeatherUiState> = _state.asStateFlow()
+    private val _settingsFlow = combine(
+        settings.getLanguage(),
+        settings.getUnits(),
+        settings.getDefaultLocation(),
+        settings.getFavoriteSet()
+    ) { language, units, defaultLocation, favoriteSet ->
+        Settings(units, language, defaultLocation, favoriteSet)
+    }
+
+    private val _state: MutableStateFlow<WeatherViewState> =
+        MutableStateFlow(WeatherViewState.Loading())
+    val state: StateFlow<WeatherViewState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            combine(
-                _language,
-                _units,
-            ) { language, units ->
-                Settings(units, language)
-            }.collect { (units, language) ->
-                setState {
-                    copy(
-                        language = language,
-                        units = units,
-                        defaultLocation = defaultLocation
-                    )
-                }.also { processIntent(WeatherScreenIntent.LoadWeatherScreenData) }
-            }
+        _settingsFlow
+            .onStart { obtainIntent(WeatherScreenIntent.LoadWeatherScreenData(_settingsFlow.first())) }
+            .onEach { obtainIntent(WeatherScreenIntent.SettingsChanged(it)) }
+            .launchIn(viewModelScope)
+    }
+
+    override fun obtainIntent(intent: WeatherScreenIntent) {
+        when (val state = state.value) {
+            is WeatherViewState.Loading -> reduce(intent, state)
+            is WeatherViewState.Display -> reduce(intent, state)
         }
     }
 
-    fun processIntent(intent: WeatherScreenIntent) {
+    private fun reduce(intent: WeatherScreenIntent, currentState: WeatherViewState.Loading) {
         when (intent) {
+            WeatherScreenIntent.ChangeFavorite -> Unit
+
             is WeatherScreenIntent.LoadWeatherScreenData -> {
                 viewModelScope.launch {
-                    val result = weatherRepository.getWeather(
-                        coordinates = state.value.defaultLocation,
-                        language = state.value.language.languageValue,
-                        units = state.value.units.unitsValue
+                    val result = getWeatherByCoordinates(
+                        coordinates = intent.value.defaultLocation,
+                        settings = intent.value
                     )
-                    processResult(result)
+                    processResult(result, currentState)
                 }
             }
 
-            is WeatherScreenIntent.SearchWeatherByCity -> {
-                viewModelScope.launch {
-                    val result = weatherRepository.getWeather(
-                        city = City(state.value.searchInput),
-                        language = state.value.language.languageValue,
-                        units = state.value.units.unitsValue
-                    )
-                    processResult(result)
+            is WeatherScreenIntent.SearchInputChanged -> _state.update {
+                currentState.copy(
+                    searchInput = intent.value,
+                    searchError = false
+                )
+            }
+
+            WeatherScreenIntent.SearchWeatherByCity -> {
+                if (currentState.searchInput != "") {
+                    viewModelScope.launch {
+                        val result = getWeatherByCity(
+                            city = City(currentState.searchInput),
+                            settings = _settingsFlow.first()
+                        )
+                        processResult(result, currentState)
+                    }
+                } else {
+                    _state.update { currentState.copy(searchError = true) }
                 }
             }
 
             is WeatherScreenIntent.SearchWeatherByCoordinates -> {
                 viewModelScope.launch {
-                    val result = weatherRepository.getWeather(
+                    val result = getWeatherByCoordinates(
                         coordinates = intent.coordinates,
-                        language = state.value.language.languageValue,
-                        units = state.value.units.unitsValue
+                        settings = _settingsFlow.first()
                     )
-                    processResult(result)
+                    processResult(result, currentState)
                 }
             }
 
-            is WeatherScreenIntent.SearchInputChanged -> {
-                setState { copy(searchInput = intent.value) }
+            is WeatherScreenIntent.SettingsChanged -> Unit
+        }
+    }
+
+    private fun reduce(intent: WeatherScreenIntent, currentState: WeatherViewState.Display) {
+        when (intent) {
+            WeatherScreenIntent.ChangeFavorite -> {
+                viewModelScope.launch {
+                    if (currentState.weatherUiState.isFavorite) {
+                        settings.removeFromFavorite(currentState.weatherUiState.weather.currentWeather.id)
+                    } else {
+                        settings.addToFavorite(currentState.weatherUiState.weather.currentWeather.id)
+                    }
+                }
             }
 
-            is WeatherScreenIntent.ChangeFavorite -> {
-                setState { copy(isFavorite = !_state.value.isFavorite) }
+            is WeatherScreenIntent.LoadWeatherScreenData -> Unit
+
+            is WeatherScreenIntent.SearchInputChanged -> _state.update {
+                currentState.copy(
+                    searchInput = intent.value,
+                    searchError = false
+                )
+            }
+
+            WeatherScreenIntent.SearchWeatherByCity -> {
+                if (currentState.searchInput != "") {
+                    viewModelScope.launch {
+                        val result = getWeatherByCity(
+                            city = City(currentState.searchInput),
+                            settings = _settingsFlow.first()
+                        )
+                        processResult(result, currentState)
+                    }
+                } else {
+                    _state.update { currentState.copy(searchError = true, errorMessageId = R.string.error_empty_city) }
+                }
+            }
+
+            is WeatherScreenIntent.SearchWeatherByCoordinates -> {
+                viewModelScope.launch {
+                    val result = getWeatherByCoordinates(
+                        coordinates = intent.coordinates,
+                        settings = _settingsFlow.first()
+                    )
+                    processResult(result, currentState)
+                }
+            }
+
+            is WeatherScreenIntent.SettingsChanged -> {
+                viewModelScope.launch {
+                    val result = getWeatherByCoordinates(
+                        coordinates = currentState.weatherUiState.weather.currentWeather.coordinates,
+                        settings = _settingsFlow.first()
+                    )
+                    processResult(result, currentState)
+                }
             }
         }
     }
 
-    private fun processResult(result: WeatherResult<Weather>) {
+    private suspend fun getWeatherByCity(city: City, settings: Settings): WeatherResult<Weather> {
+        return weatherRepository.getWeather(
+            city = city,
+            units = settings.units,
+            language = settings.language
+        )
+    }
+
+    private suspend fun getWeatherByCoordinates(
+        coordinates: Coordinates,
+        settings: Settings
+    ): WeatherResult<Weather> {
+        return weatherRepository.getWeather(
+            coordinates = coordinates,
+            units = settings.units,
+            language = settings.language
+        )
+    }
+
+    private fun processResult(result: WeatherResult<Weather>, weatherViewState: WeatherViewState) {
         when (result) {
             is WeatherResult.Success -> {
                 val weatherData = result.data
-                setState {
-                    copy(
+                _state.value = WeatherViewState.Display(
+                    searchInput = weatherViewState.searchInput,
+                    isLoading = false,
+                    searchError = false,
+                    errorMessageId = null,
+                    weatherUiState = WeatherUiState(
                         weather = weatherData,
-                        isLoading = false,
-                        errorMessageId = null
+                        isFavorite = settings.checkToFavorite(weatherData.currentWeather.id)
                     )
-                }
+                )
             }
 
             is WeatherResult.Error -> {
-                setState {
-                    copy(
-                        isLoading = false,
-                        errorMessageId = result.errorType.toResourceId()
-                    )
-                }
-            }
-        }
-    }
 
-    private fun setState(stateReducer: WeatherUiState.() -> WeatherUiState) {
-        viewModelScope.launch {
-            _state.emit(stateReducer(state.value))
+                _state.value = WeatherViewState.Loading(
+                    searchInput = weatherViewState.searchInput,
+                    isLoading = false,
+                    searchError = result.errorType == ErrorType.WRONG_CITY,
+                    errorMessageId = result.errorType.toResourceId()
+                )
+            }
         }
     }
 }
 
+sealed interface WeatherViewState {
+
+    val searchInput: String
+    val isLoading: Boolean
+    val searchError: Boolean
+    val errorMessageId: Int?
+
+    data class Loading(
+        override val searchInput: String = "",
+        override val isLoading: Boolean = true,
+        override val searchError: Boolean = false,
+        override val errorMessageId: Int? = null
+    ) : WeatherViewState
+
+    data class Display(
+        override val searchInput: String,
+        override val isLoading: Boolean,
+        override val searchError: Boolean,
+        override val errorMessageId: Int?,
+        val weatherUiState: WeatherUiState,
+    ) : WeatherViewState
+}
+
 data class WeatherUiState(
-    val weather: Weather = Weather.defaultEmptyWeather(),
-    val units: Units = Units.METRIC,
-    val defaultLocation: Coordinates = Coordinates(Const.DEFAULT_LON, Const.DEFAULT_LAT),
-    val language: SupportedLanguage = SupportedLanguage.ENGLISH,
-    val searchInput: String = "",
-    val isFavorite: Boolean = false,
-    val isLoading: Boolean = false,
-    @StringRes val errorMessageId: Int? = null
+    val weather: Weather,
+    val isFavorite: Boolean
 )

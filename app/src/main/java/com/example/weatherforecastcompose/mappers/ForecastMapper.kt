@@ -9,12 +9,12 @@ import kotlin.math.roundToInt
 
 internal fun ForecastResponse.toForecastList(): List<Forecast> {
 
-     return list.map {
-            Forecast(
-                temperature = it.main.temp.roundToInt().toString(),
-                data = it.dt.format(FORMAT_EEE_d_MMMM_HH_mm, city.timezone),
-                humidity = it.main.humidity.toString(),
-                weatherType = WeatherType.find("ic_${it.weather.firstOrNull()?.icon}")
-            )
+    return list.map {
+        Forecast(
+            temperature = it.main.temp.roundToInt().toString(),
+            data = it.dt.format(FORMAT_EEE_d_MMMM_HH_mm, city.timezone),
+            humidity = it.main.humidity.toString(),
+            weatherType = WeatherType.find("ic_${it.weather.firstOrNull()?.icon}")
+        )
     }
 }

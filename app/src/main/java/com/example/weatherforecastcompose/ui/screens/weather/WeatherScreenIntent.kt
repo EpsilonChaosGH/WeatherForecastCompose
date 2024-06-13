@@ -2,11 +2,14 @@ package com.example.weatherforecastcompose.ui.screens.weather
 
 import com.example.weatherforecastcompose.model.City
 import com.example.weatherforecastcompose.model.Coordinates
+import com.example.weatherforecastcompose.model.Settings
 
 
 sealed interface WeatherScreenIntent {
 
-    data object LoadWeatherScreenData : WeatherScreenIntent
+    data class SettingsChanged(val value: Settings) : WeatherScreenIntent
+
+    data class LoadWeatherScreenData(val value: Settings) : WeatherScreenIntent
 
     data object SearchWeatherByCity : WeatherScreenIntent
 

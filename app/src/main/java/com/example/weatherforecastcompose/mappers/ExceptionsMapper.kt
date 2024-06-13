@@ -1,50 +1,32 @@
 package com.example.weatherforecastcompose.mappers
 
+import android.util.Log
 import androidx.annotation.StringRes
 import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.data.ClientException
-import com.example.weatherforecastcompose.data.FORMAT_EEE_d_MMMM_HH_mm
 import com.example.weatherforecastcompose.data.GenericException
 import com.example.weatherforecastcompose.data.ServerException
-import com.example.weatherforecastcompose.data.format
-import com.example.weatherforecastcompose.data.network.response.CurrentWeatherResponse
-import com.example.weatherforecastcompose.model.Coordinates
+import com.example.weatherforecastcompose.data.WrongCityException
 import com.example.weatherforecastcompose.model.ErrorType
-import com.example.weatherforecastcompose.model.CurrentWeather
-import com.example.weatherforecastcompose.model.WeatherType
 import retrofit2.Response
 import java.io.IOException
 import java.net.HttpURLConnection
 
 
-fun CurrentWeatherResponse.toWeather(): CurrentWeather = CurrentWeather(
-    id = id,
-    coordinates = Coordinates(
-        lon = coord.lon.toString(),
-        lat = coord.lat.toString()
-    ),
-    city = name,
-    country = sys.country,
-    temperature = main.temp.toString(),
-    icon = WeatherType.find("ic_${weather.firstOrNull()?.icon}"),
-    description = weather.firstOrNull()?.description ?: "unknown",
-    feelsLike = main.feelsLike.toString(),
-    humidity = main.humidity.toString(),
-    pressure = main.pressure.toString(),
-    windSpeed = wind.speed.toString(),
-    data = dt.format(FORMAT_EEE_d_MMMM_HH_mm, timezone),
-    timezone = timezone,
-)
-
 fun <T, R> Response<T>.responseToDate(mapper: T.() -> R): R {
     try {
+        Log.e("aaaR","${this.isSuccessful}  ${this.body() == null}")
         return if (this.isSuccessful && this.body() != null) {
             this.body()!!.mapper()
         } else {
             val throwable = mapResponseCodeToThrowable(this.code())
             throw throwable
+//            Log.e("aaaCode",this.code().toString())
+//            throw ClientException("!@#")
+//            throw IllegalStateException("!@#")
         }
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
+        Log.e("aaaCATHE",e.message.toString())
         throw e
     }
 }
@@ -55,6 +37,7 @@ fun ErrorType.toResourceId(): Int = when (this) {
     ErrorType.GENERIC -> R.string.error_generic
     ErrorType.IO_CONNECTION -> R.string.error_connection
     ErrorType.CLIENT -> R.string.error_client
+    ErrorType.WRONG_CITY -> R.string.error_wrong_city
 }
 
 fun mapResponseCodeToThrowable(code: Int): Throwable = when (code) {
@@ -69,6 +52,7 @@ fun mapResponseCodeToThrowable(code: Int): Throwable = when (code) {
 
 fun mapThrowableToErrorType(throwable: Throwable): ErrorType {
     val errorType = when (throwable) {
+        is WrongCityException -> ErrorType.WRONG_CITY
         is IOException -> ErrorType.IO_CONNECTION
         is ClientException -> ErrorType.CLIENT
         is ServerException -> ErrorType.SERVER
@@ -78,5 +62,5 @@ fun mapThrowableToErrorType(throwable: Throwable): ErrorType {
 }
 
 private val SERVER_ERRORS = 500..600
-private val CLIENT_ERRORS = 400..499
+private  val CLIENT_ERRORS = 400..499
 private const val TOO_MANY_REQUESTS = 429
