@@ -1,6 +1,5 @@
 package com.example.weatherforecastcompose.mappers
 
-import android.util.Log
 import androidx.annotation.StringRes
 import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.data.ClientException
@@ -15,18 +14,13 @@ import java.net.HttpURLConnection
 
 fun <T, R> Response<T>.responseToDate(mapper: T.() -> R): R {
     try {
-        Log.e("aaaR","${this.isSuccessful}  ${this.body() == null}")
         return if (this.isSuccessful && this.body() != null) {
             this.body()!!.mapper()
         } else {
             val throwable = mapResponseCodeToThrowable(this.code())
             throw throwable
-//            Log.e("aaaCode",this.code().toString())
-//            throw ClientException("!@#")
-//            throw IllegalStateException("!@#")
         }
     } catch (e: Throwable) {
-        Log.e("aaaCATHE",e.message.toString())
         throw e
     }
 }
@@ -62,5 +56,5 @@ fun mapThrowableToErrorType(throwable: Throwable): ErrorType {
 }
 
 private val SERVER_ERRORS = 500..600
-private  val CLIENT_ERRORS = 400..499
+private val CLIENT_ERRORS = 400..499
 private const val TOO_MANY_REQUESTS = 429

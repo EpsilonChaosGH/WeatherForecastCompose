@@ -9,6 +9,5 @@ fun SettingsScreen(
     modifier: Modifier,
     navController: NavController,
 ) {
-
     SettingsViewDisplay()
 }

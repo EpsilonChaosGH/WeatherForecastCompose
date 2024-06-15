@@ -1,8 +1,7 @@
-package com.example.weatherforecastcompose.ui.screens.weather
+package com.example.weatherforecastcompose.ui.screens.weather.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.model.Coordinates
-import com.example.weatherforecastcompose.model.ErrorType
+import com.example.weatherforecastcompose.ui.screens.weather.WeatherViewState
 import com.example.weatherforecastcompose.ui.theme.WeatherForecastComposeTheme
 
 @Composable
@@ -146,11 +145,13 @@ internal fun WeatherSearchPreview() {
         ) {
             Column {
                 WeatherSearch(
-                    weatherViewState = WeatherViewState.Loading(
+                    weatherViewState = WeatherViewState(
                         searchInput = "Moscow",
                         isLoading = false,
+                        isRefreshing = false,
                         searchError = false,
-                        errorMessageId = null
+                        errorMessageId = null,
+                        weatherUiState = null
                     ),
                     onSearchInputChanged = {},
                     onSearchDoneClick = {},
@@ -158,11 +159,13 @@ internal fun WeatherSearchPreview() {
                 )
 
                 WeatherSearch(
-                    weatherViewState = WeatherViewState.Loading(
+                    weatherViewState = WeatherViewState(
                         searchInput = "AAAAAAAA",
+                        isRefreshing = true,
                         isLoading = false,
                         searchError = true,
-                        errorMessageId = R.string.error_wrong_city
+                        errorMessageId = R.string.error_wrong_city,
+                        weatherUiState = null
                     ),
                     onSearchInputChanged = {},
                     onSearchDoneClick = {},

@@ -1,25 +1,24 @@
 package com.example.weatherforecastcompose.data
 
 import android.util.Log
-import com.example.weatherforecastcompose.mappers.mapThrowableToErrorType
 import com.example.weatherforecastcompose.data.network.response.AirResponse
-import com.example.weatherforecastcompose.data.network.response.CurrentWeatherResponse
 import com.example.weatherforecastcompose.data.network.response.ForecastResponse
 import com.example.weatherforecastcompose.data.network.services.AirService
 import com.example.weatherforecastcompose.data.network.services.ForecastService
 import com.example.weatherforecastcompose.data.network.services.GeocodingService
 import com.example.weatherforecastcompose.data.network.services.WeatherService
+import com.example.weatherforecastcompose.mappers.mapThrowableToErrorType
 import com.example.weatherforecastcompose.mappers.responseToDate
 import com.example.weatherforecastcompose.mappers.toAir
-import com.example.weatherforecastcompose.mappers.toWeather
 import com.example.weatherforecastcompose.mappers.toForecastList
+import com.example.weatherforecastcompose.mappers.toWeather
 import com.example.weatherforecastcompose.model.City
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
 import com.example.weatherforecastcompose.model.Weather
 import com.example.weatherforecastcompose.model.WeatherResult
-import org.intellij.lang.annotations.Language
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,32 +47,36 @@ class WeatherRepository @Inject constructor(
         }
     }
 
-    suspend fun getWeather(
-        city: City,
-        units: Units,
-        language: SupportedLanguage,
-    ): WeatherResult<Weather> {
+//    suspend fun getWeather(
+//        city: City,
+//        units: Units,
+//        language: SupportedLanguage,
+//    ): WeatherResult<Weather> {
+//        return try {
+//            val weather = getWeatherByCoordinates(
+//                coordinates = getCoordinatesByCity(city),
+//                units = units,
+//                language = language
+//            )
+//            WeatherResult.Success(weather)
+//        } catch (e: Throwable) {
+//            WeatherResult.Error(mapThrowableToErrorType(e))
+//        }
+//    }
+
+    suspend fun getCoordinatesByCity(city: City): WeatherResult<Coordinates> {
         return try {
-            val weather = getWeatherByCoordinates(
-                coordinates = getCoordinatesByCity(city),
-                units = units,
-                language = language
-            )
-            WeatherResult.Success(weather)
+            val coordinates = geocodingService.getCoordinatesByCity(city.city).responseToDate {
+                val response = this.firstOrNull()
+                if (response != null) {
+                    Coordinates(lat = response.lat.toString(), lon = response.lon.toString())
+                } else {
+                    throw WrongCityException("City not found")
+                }
+            }
+            WeatherResult.Success(coordinates)
         } catch (e: Throwable) {
             WeatherResult.Error(mapThrowableToErrorType(e))
-        }
-    }
-
-    private suspend fun getCoordinatesByCity(city: City): Coordinates {
-        return geocodingService.getCoordinatesByCity(city.city).responseToDate {
-            val response = this.firstOrNull()
-            if (response != null) {
-                Coordinates(lat = response.lat.toString(), lon = response.lon.toString())
-            } else {
-                throw WrongCityException("City not found")
-            }
-
         }
     }
 
@@ -82,6 +85,9 @@ class WeatherRepository @Inject constructor(
         units: Units,
         language: SupportedLanguage,
     ): Weather {
+
+        Log.e("aaaTESTER", coordinates.lat)
+        delay(1500)
 
         val currentWeather = weatherService.getCurrentWeatherByCoordinates(
             lat = coordinates.lat,

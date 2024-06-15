@@ -94,7 +94,7 @@ fun AppNavHost(
             }
         }
     ) { paddingValues ->
-
+//    val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 //        val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
         Box(
             modifier = Modifier.paint(
