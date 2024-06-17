@@ -26,6 +26,11 @@
     <string name="title_pm10">PM10:</string>
     <string name="title_o3">O3:</string>
 
+    <string name="title_language">Language:</string>
+    <string name="title_units">Units:</string>
+
+    <string name="bt_save">Save</string>
+
 
     <string name="error_client">Oops,something fishy is up on your end :)</string>
     <string name="error_server">Oops! Something is wrong on our end :(</string>
@@ -67,4 +72,5 @@
     <string name="mist_night">50n</string>
 
     <string name="unknown">unknown</string>
+
 </resources>

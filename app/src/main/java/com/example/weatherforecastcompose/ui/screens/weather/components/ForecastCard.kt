@@ -36,9 +36,9 @@ internal fun ForecastCard(forecastList: List<Forecast>) {
                 end = 20.dp,
                 bottom = 10.dp
             ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+//        colors = CardDefaults.cardColors(
+//            containerColor = MaterialTheme.colorScheme.surface,
+//        ),
     ) {
         forecastList.forEachIndexed { index, item ->
             ForecastItemCard(
@@ -50,7 +50,7 @@ internal fun ForecastCard(forecastList: List<Forecast>) {
             if (forecastList.size != index + 1) {
                 HorizontalDivider(
                     modifier = Modifier.padding(start = 20.dp, end = 20.dp),
-                    color = MaterialTheme.colorScheme.onSurface,
+//                    color = MaterialTheme.colorScheme.onSurface,
                     thickness = 1.dp
                 )
             }
@@ -75,7 +75,7 @@ internal fun ForecastItemCard(
         Icon(
             modifier = Modifier
                 .size(60.dp),
-            tint = MaterialTheme.colorScheme.onSurface,
+//            tint = MaterialTheme.colorScheme.onSurface,
             painter = painterResource(iconId),
             contentDescription = "weather icon",
         )
@@ -91,7 +91,7 @@ internal fun ForecastItemCard(
             Text(text = humidity)
             Icon(
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface,
+//                tint = MaterialTheme.colorScheme.onSurface,
                 painter = painterResource(R.drawable.ic_humidity),
                 contentDescription = "weather icon",
             )
@@ -103,7 +103,7 @@ internal fun ForecastItemCard(
             Text(text = temperature)
             Icon(
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface,
+//                tint = MaterialTheme.colorScheme.onSurface,
                 painter = painterResource(R.drawable.ic_temperature),
                 contentDescription = "weather icon",
             )
@@ -111,15 +111,15 @@ internal fun ForecastItemCard(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 internal fun ForecastCardPreview() {
     WeatherForecastComposeTheme {
         Column(
-            modifier = Modifier.paint(
-                painterResource(id = R.drawable.sky_wallpaper),
-                contentScale = ContentScale.FillBounds
-            )
+//            modifier = Modifier.paint(
+//                painterResource(id = R.drawable.sky_wallpaper),
+//                contentScale = ContentScale.FillBounds
+//            )
         ) {
             ForecastCard(
                 listOf(

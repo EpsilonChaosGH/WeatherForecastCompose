@@ -48,7 +48,7 @@ fun AppNavHost(
     Scaffold(
         bottomBar = {
             BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.surface,
+//                containerColor = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.height(100.dp)
             ) {
                 val backStackEntry by navController.currentBackStackEntryAsState()
@@ -82,13 +82,13 @@ fun AppNavHost(
 //                            )
 //                        },
 //                        alwaysShowLabel = false,
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent,
-                            selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurface,
-                        )
+//                        colors = NavigationBarItemDefaults.colors(
+//                            indicatorColor = Color.Transparent,
+//                            selectedIconColor = MaterialTheme.colorScheme.onSurface,
+//                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+//                            unselectedTextColor = MaterialTheme.colorScheme.onSurface,
+//                        )
                     )
                 }
             }
@@ -96,12 +96,12 @@ fun AppNavHost(
     ) { paddingValues ->
 //    val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 //        val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-        Box(
-            modifier = Modifier.paint(
-                painterResource(id = R.drawable.sky_wallpaper),
-                contentScale = ContentScale.FillBounds
-            )
-        )
+//        Box(
+//            modifier = Modifier.paint(
+//                painterResource(id = R.drawable.sky_wallpaper),
+//                contentScale = ContentScale.FillBounds
+//            )
+//        )
 
         NavHost(
             navController = navController,

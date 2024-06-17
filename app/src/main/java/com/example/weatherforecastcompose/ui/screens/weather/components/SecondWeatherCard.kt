@@ -75,15 +75,15 @@ internal fun SecondWeatherCard(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 internal fun SecondWeatherCardPreview() {
     WeatherForecastComposeTheme {
         Column(
-            modifier = Modifier.paint(
-                painterResource(id = R.drawable.sky_wallpaper),
-                contentScale = ContentScale.FillBounds
-            )
+//            modifier = Modifier.paint(
+//                painterResource(id = R.drawable.sky_wallpaper),
+//                contentScale = ContentScale.FillBounds
+//            )
         ) {
             SecondWeatherCard(
                 currentWeather = CurrentWeather(

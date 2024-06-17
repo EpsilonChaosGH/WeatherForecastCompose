@@ -11,9 +11,9 @@ enum class Units(
     val tempUnits: String,
     val windUnits: String
 ) {
-    STANDARD("Kelvin", R.drawable.ic_settings, "standard", "K","m/s"),
-    METRIC("Celsius", R.drawable.ic_settings, "metric", "°C","m/s"),
-    IMPERIAL("Fahrenheit", R.drawable.ic_settings, "imperial", "°F","mph");
+    STANDARD("Kelvin", R.drawable.ic_standard, "standard", "K","m/s"),
+    METRIC("Celsius", R.drawable.ic_metric, "metric", "°C","m/s"),
+    IMPERIAL("Fahrenheit", R.drawable.ic_imperial, "imperial", "°F","mph");
 
     companion object {
         fun getUnitsSpinnerItem(): Array<SpinnerItem> {

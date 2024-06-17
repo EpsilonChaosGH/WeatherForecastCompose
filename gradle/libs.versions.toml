@@ -13,6 +13,7 @@ androidxHiltNavigationCompose = "1.2.0"
 hilt = "2.51"
 okhttp = "4.12.0"
 retrofit = "2.9.0"
+datastore = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,8 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", v
 moshi-converter = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "retrofit" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+
+datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }

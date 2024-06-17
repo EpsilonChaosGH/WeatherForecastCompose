@@ -78,15 +78,15 @@ internal fun AirCard(air: Air) {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 internal fun AirCardPreview() {
     WeatherForecastComposeTheme {
         Column(
-            modifier = Modifier.paint(
-                painterResource(id = R.drawable.sky_wallpaper),
-                contentScale = ContentScale.FillBounds
-            )
+//            modifier = Modifier.paint(
+//                painterResource(id = R.drawable.sky_wallpaper),
+//                contentScale = ContentScale.FillBounds
+//            )
         ) {
             AirCard(
                 air = Air(

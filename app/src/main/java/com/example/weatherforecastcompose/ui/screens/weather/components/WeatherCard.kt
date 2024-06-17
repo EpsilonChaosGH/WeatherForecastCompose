@@ -50,9 +50,9 @@ internal fun WeatherCard(
                 top = 10.dp,
                 end = 20.dp,
             ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+//        colors = CardDefaults.cardColors(
+//            containerColor = MaterialTheme.colorScheme.surface,
+//        ),
     ) {
         Row(
             Modifier
@@ -64,7 +64,7 @@ internal fun WeatherCard(
                 modifier = Modifier.weight(1f)
             ) {
                 Row {
-                    Image(
+                    Icon(
                         modifier = Modifier.size(22.dp),
                         painter = painterResource(id = R.drawable.ic_baseline_location_on),
                         contentDescription = stringResource(id = R.string.image_content_description_city)
@@ -73,7 +73,7 @@ internal fun WeatherCard(
                     Text(text = currentWeather.city)
                 }
                 Row(modifier = Modifier.padding(top = 6.dp)) {
-                    Image(
+                    Icon(
                         modifier = Modifier.size(22.dp),
                         painter = painterResource(id = R.drawable.ic_calendar),
                         contentDescription = stringResource(id = R.string.image_content_description_date)
@@ -96,7 +96,7 @@ internal fun WeatherCard(
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    tint = MaterialTheme.colorScheme.onSurface,
+//                    tint = MaterialTheme.colorScheme.onSurface,
                     painter = painterResource(
                         currentWeather.icon.iconResId
                     ),
@@ -105,7 +105,7 @@ internal fun WeatherCard(
                 IconButton(onClick = onFavoriteIconClick) {
                     Icon(
                         modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.onSurface,
+//                        tint = MaterialTheme.colorScheme.onSurface,
                         painter = painterResource(
                             if (isFavorite) R.drawable.ic_baseline_favorite_24
                             else R.drawable.ic_baseline_favorite_border_24
@@ -118,15 +118,15 @@ internal fun WeatherCard(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 internal fun WeatherCardPreview() {
     WeatherForecastComposeTheme {
         Box(
-            modifier = Modifier.paint(
-                painterResource(id = R.drawable.sky_wallpaper),
-                contentScale = ContentScale.FillBounds
-            )
+//            modifier = Modifier.paint(
+//                painterResource(id = R.drawable.sky_wallpaper),
+//                contentScale = ContentScale.FillBounds
+//            )
         ) {
             WeatherCard(
                 currentWeather = CurrentWeather(

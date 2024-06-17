@@ -50,9 +50,9 @@ internal fun WeatherSearch(
                 top = 20.dp,
                 end = 20.dp,
             ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
-        ),
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color.Transparent,
+//        ),
     ) {
         TextField(
             modifier = Modifier
@@ -64,15 +64,15 @@ internal fun WeatherSearch(
                 if (!weatherViewState.searchError) {
                     Text(
                         text = stringResource(R.string.title_search),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        color = MaterialTheme.colorScheme.onSurface
                     )
                 } else {
                     weatherViewState.errorMessageId?.let {
                         Text(
                             text = stringResource(it),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+//                            style = MaterialTheme.typography.bodyMedium,
+//                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -81,14 +81,14 @@ internal fun WeatherSearch(
                 if (!weatherViewState.searchError) {
                     Icon(
                         modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.onSurface,
+//                        tint = MaterialTheme.colorScheme.onSurface,
                         painter = painterResource(R.drawable.ic_baseline_search),
                         contentDescription = stringResource(R.string.image_content_description_search),
                     )
                 } else {
                     Icon(
                         modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.onError,
+//                        tint = MaterialTheme.colorScheme.onError,
                         painter = painterResource(R.drawable.ic_error),
                         contentDescription = stringResource(R.string.image_content_description_search_error),
                     )
@@ -103,20 +103,21 @@ internal fun WeatherSearch(
                 }) {
                     Icon(
                         modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.onSurface,
+//                        tint = MaterialTheme.colorScheme.onSurface,
                         painter = painterResource(R.drawable.ic_baseline_my_location),
                         contentDescription = "weather icon",
                     )
                 }
             },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                cursorColor = MaterialTheme.colorScheme.onSurface,
-                errorContainerColor = MaterialTheme.colorScheme.error,
+//                focusedContainerColor = MaterialTheme.colorScheme.surface,
+//                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+//                cursorColor = MaterialTheme.colorScheme.onSurface,
+//                errorContainerColor = MaterialTheme.colorScheme.error,
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent
+                errorIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
             ),
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -133,15 +134,15 @@ internal fun WeatherSearch(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 internal fun WeatherSearchPreview() {
     WeatherForecastComposeTheme {
         Box(
-            modifier = Modifier.paint(
-                painterResource(id = R.drawable.sky_wallpaper),
-                contentScale = ContentScale.FillBounds
-            )
+//            modifier = Modifier.paint(
+//                painterResource(id = R.drawable.sky_wallpaper),
+//                contentScale = ContentScale.FillBounds
+//            )
         ) {
             Column {
                 WeatherSearch(

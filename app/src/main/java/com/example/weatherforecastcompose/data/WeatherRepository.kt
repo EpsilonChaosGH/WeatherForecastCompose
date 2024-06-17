@@ -32,8 +32,8 @@ class WeatherRepository @Inject constructor(
 
     suspend fun getWeather(
         coordinates: Coordinates,
-        units: Units,
         language: SupportedLanguage,
+        units: Units,
     ): WeatherResult<Weather> {
         return try {
             val weather = getWeatherByCoordinates(

@@ -1,5 +1,6 @@
 package com.example.weatherforecastcompose.ui.screens.weather
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecastcompose.R
@@ -10,6 +11,7 @@ import com.example.weatherforecastcompose.mappers.toResourceId
 import com.example.weatherforecastcompose.model.City
 import com.example.weatherforecastcompose.model.ErrorType
 import com.example.weatherforecastcompose.model.Settings
+import com.example.weatherforecastcompose.model.Units
 import com.example.weatherforecastcompose.model.Weather
 import com.example.weatherforecastcompose.model.WeatherResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,10 +37,16 @@ class WeatherViewModel @Inject constructor(
     private val _settingsFlow = combine(
         settings.getLanguage(),
         settings.getUnits(),
-        settings.getCurrentLocation(),
+        settings.getCoordinates(),
         settings.getFavoriteSet()
-    ) { language, units, defaultLocation, favoriteSet ->
-        Settings(units, language, defaultLocation, favoriteSet)
+    ) { language, units, coordinates, favoriteSet ->
+        Log.e("aaa_settingsFlow", language.toString() + units.toString() + coordinates.toString())
+        Settings(
+            language = language,
+            units = units,
+            coordinates = coordinates,
+            favoriteSet = favoriteSet
+        )
     }
 
     private val _state: MutableStateFlow<WeatherViewState> =
@@ -74,7 +82,10 @@ class WeatherViewModel @Inject constructor(
             WeatherScreenIntent.SearchWeatherByCity -> getWeatherByCity()
 
             is WeatherScreenIntent.SearchWeatherByCoordinates -> {
-                viewModelScope.launch { settings.setNewLocation(intent.value) }
+                viewModelScope.launch {
+                    settings.setUnits(Units.STANDARD)
+//                    settings.setCoordinates(intent.value)
+                }
             }
 
             WeatherScreenIntent.RefreshWeather -> refreshWeather()
@@ -104,7 +115,7 @@ class WeatherViewModel @Inject constructor(
                 val result = weatherRepository.getCoordinatesByCity(City(state.value.searchInput))
 
                 when (result) {
-                    is WeatherResult.Success -> settings.setNewLocation(result.data)
+                    is WeatherResult.Success -> settings.setCoordinates(result.data)
                     is WeatherResult.Error -> {
                         _state.update {
                             it.copy(
@@ -130,9 +141,9 @@ class WeatherViewModel @Inject constructor(
     private fun getWeatherByCoordinates(settings: Settings) {
         viewModelScope.launch {
             val result = weatherRepository.getWeather(
-                coordinates = settings.defaultLocation,
-                units = settings.units,
-                language = settings.language
+                coordinates = settings.coordinates,
+                language = settings.language,
+                units = settings.units
             )
             processResult(result)
         }
