@@ -1,6 +1,5 @@
 package com.example.weatherforecastcompose.ui.screens.weather.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,18 +13,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,12 +58,12 @@ internal fun WeatherCard(
                 .height(IntrinsicSize.Min)
         ) {
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Row {
                     Icon(
                         modifier = Modifier.size(22.dp),
-                        painter = painterResource(id = R.drawable.ic_baseline_location_on),
+                        painter = painterResource(id = R.drawable.ic_location),
                         contentDescription = stringResource(id = R.string.image_content_description_city)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
@@ -87,15 +84,15 @@ internal fun WeatherCard(
                         fontSize = 22.sp
                     )
                 }
-                Text(text = currentWeather.temperature, fontSize = 44.sp)
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = currentWeather.temperature, fontSize = 54.sp)
             }
             Column(
                 modifier = Modifier.fillMaxHeight(),
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Icon(
-                    modifier = Modifier.size(100.dp),
+                    modifier = Modifier.size(140.dp),
 //                    tint = MaterialTheme.colorScheme.onSurface,
                     painter = painterResource(
                         currentWeather.icon.iconResId
@@ -107,8 +104,8 @@ internal fun WeatherCard(
                         modifier = Modifier.size(40.dp),
 //                        tint = MaterialTheme.colorScheme.onSurface,
                         painter = painterResource(
-                            if (isFavorite) R.drawable.ic_baseline_favorite_24
-                            else R.drawable.ic_baseline_favorite_border_24
+                            if (isFavorite) R.drawable.ic_heart_selected
+                            else R.drawable.ic_heart_unselected
                         ),
                         contentDescription = stringResource(id = R.string.image_content_description_is_favorite),
                     )

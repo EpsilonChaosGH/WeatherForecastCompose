@@ -63,7 +63,7 @@ fun SettingsScreen(
         SettingOptionRow(
             optionLabel = stringResource(R.string.title_units),
             optionValue = uiState.selectedUnit.tempLabel,
-            optionIcon = R.drawable.ic_temperature,
+            optionIcon = R.drawable.ic_weather_thermometer,
             optionIconValue = uiState.selectedUnit.iconResId,
         ) {
             scope.launch {

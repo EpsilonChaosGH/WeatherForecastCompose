@@ -8,8 +8,6 @@ sealed interface WeatherScreenIntent {
 
     data class SettingsChanged(val value: Settings) : WeatherScreenIntent
 
-    data class LoadWeatherScreenData(val value: Settings) : WeatherScreenIntent
-
     data object SearchWeatherByCity : WeatherScreenIntent
 
     data class SearchWeatherByCoordinates(val value: Coordinates) : WeatherScreenIntent

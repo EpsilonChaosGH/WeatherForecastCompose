@@ -3,6 +3,7 @@ package com.example.weatherforecastcompose.ui.screens.weather
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherforecastcompose.ui.screens.weather.components.AirCard
 import com.example.weatherforecastcompose.ui.screens.weather.components.ForecastCard
@@ -35,9 +37,10 @@ internal fun WeatherScreen(
 ) {
 
     val pullToRefreshState = rememberPullToRefreshState()
-    Box(modifier = modifier
-        .nestedScroll(pullToRefreshState.nestedScrollConnection)
-        .fillMaxSize()
+    Box(
+        modifier = modifier
+            .nestedScroll(pullToRefreshState.nestedScrollConnection)
+            .fillMaxSize()
     ) {
 
 
@@ -56,7 +59,21 @@ internal fun WeatherScreen(
                     SecondWeatherCard(currentWeather = weatherViewState.weatherUiState.weather.currentWeather)
                 }
                 item {
+                    Text(
+                        text = "Air pollution:",
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(start = 22.dp, top = 22.dp)
+                    )
+                }
+                item {
                     AirCard(air = weatherViewState.weatherUiState.weather.air)
+                }
+                item {
+                    Text(
+                        text = "Weather forecast:",
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(start = 22.dp, top = 22.dp)
+                    )
                 }
                 item {
                     ForecastCard(forecastList = weatherViewState.weatherUiState.weather.forecast)

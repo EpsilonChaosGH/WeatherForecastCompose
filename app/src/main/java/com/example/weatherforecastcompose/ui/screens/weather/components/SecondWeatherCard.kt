@@ -32,7 +32,7 @@ internal fun SecondWeatherCard(
                 ),
             titleResId = R.string.title_feels_like,
             value = currentWeather.feelsLike,
-            iconId = R.drawable.ic_temperature
+            iconId = R.drawable.ic_weather_thermometer
         )
         SmallCard(
             modifier = Modifier
@@ -44,7 +44,7 @@ internal fun SecondWeatherCard(
                 ),
             titleResId = R.string.title_humidity,
             value = currentWeather.humidity,
-            iconId = R.drawable.ic_humidity
+            iconId = R.drawable.ic_weather_humidity
         )
     }
     Row {
@@ -58,7 +58,7 @@ internal fun SecondWeatherCard(
                 ),
             titleResId = R.string.title_pressure,
             value = currentWeather.pressure,
-            iconId = R.drawable.ic_pressure
+            iconId = R.drawable.ic_weather_barometer
         )
         SmallCard(
             modifier = Modifier
@@ -70,7 +70,7 @@ internal fun SecondWeatherCard(
                 ),
             titleResId = R.string.title_wind_speed,
             value = currentWeather.windSpeed,
-            iconId = R.drawable.ic_wind
+            iconId = R.drawable.ic_weather_wind
         )
     }
 }

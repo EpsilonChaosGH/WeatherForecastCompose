@@ -92,7 +92,7 @@ internal fun ForecastItemCard(
             Icon(
                 modifier = Modifier.size(24.dp),
 //                tint = MaterialTheme.colorScheme.onSurface,
-                painter = painterResource(R.drawable.ic_humidity),
+                painter = painterResource(R.drawable.ic_weather_humidity),
                 contentDescription = "weather icon",
             )
         }
@@ -104,7 +104,7 @@ internal fun ForecastItemCard(
             Icon(
                 modifier = Modifier.size(24.dp),
 //                tint = MaterialTheme.colorScheme.onSurface,
-                painter = painterResource(R.drawable.ic_temperature),
+                painter = painterResource(R.drawable.ic_weather_thermometer),
                 contentDescription = "weather icon",
             )
         }

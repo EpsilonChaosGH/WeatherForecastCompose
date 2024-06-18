@@ -17,10 +17,10 @@ data class Air(
 )
 
 enum class AirQuality(@DrawableRes val colorResId: Int, @StringRes val iconResId: Int) {
-    GOOD(R.color.green, R.drawable.ic_good),
-    FAIR(R.color.green, R.drawable.ic_good),
-    MODERATE(R.color.yellow, R.drawable.ic_good),
-    POOR(R.color.orange, R.drawable.ic_poor),
-    VERY_POOR(R.color.red, R.drawable.ic_poor),
-    ERROR(R.color.red, R.drawable.ic_poor);
+    GOOD(R.color.green, R.drawable.ic_air_good),
+    FAIR(R.color.green, R.drawable.ic_air_good),
+    MODERATE(R.color.yellow, R.drawable.ic_air_good),
+    POOR(R.color.orange, R.drawable.ic_air_poor),
+    VERY_POOR(R.color.red, R.drawable.ic_air_poor),
+    ERROR(R.color.red, R.drawable.ic_air_poor);
 }

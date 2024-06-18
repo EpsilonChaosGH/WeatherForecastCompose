@@ -24,7 +24,7 @@ class SettingsViewModel @Inject constructor(
         settingsRepository.getLanguage(),
         settingsRepository.getUnits(),
     ) { language, units ->
-        Log.e("aaa_settingsFlowSETTINGS", language.toString() + units.toString())
+        Log.e("aaa_settingsFlowSETTINGS", language.toString() + " _____ " + units.toString())
         SettingsScreenViewState(
             selectedLanguage = language,
             selectedUnit = units
@@ -35,21 +35,36 @@ class SettingsViewModel @Inject constructor(
         initialValue = SettingsScreenViewState(),
     )
 
-    override fun obtainIntent(intent: SettingsScreenIntent) {
-        when (intent) {
-            is SettingsScreenIntent.ChangeLanguage -> {
-                viewModelScope.launch {
-                    settingsRepository.setLanguage(intent.selectedLanguage)
-                }
-            }
+//    init {
+//        viewModelScope.launch {
+//            settingsRepository.getLanguage().collect {
+//                Log.e("aaaGL", it.languageValue)
+//
+//            }
+//        }
+//        viewModelScope.launch {
+//            settingsRepository.getUnits().collect {
+//                Log.e("aaaGU", it.tempLabel)
+//            }
+//        }
+//    }
 
-            is SettingsScreenIntent.ChangeUnits -> {
-                viewModelScope.launch {
-                    settingsRepository.setUnits(intent.selectedUnits)
-                }
+
+override fun obtainIntent(intent: SettingsScreenIntent) {
+    when (intent) {
+        is SettingsScreenIntent.ChangeLanguage -> {
+            viewModelScope.launch {
+                settingsRepository.setLanguage(intent.selectedLanguage)
+            }
+        }
+
+        is SettingsScreenIntent.ChangeUnits -> {
+            viewModelScope.launch {
+                settingsRepository.setUnits(intent.selectedUnits)
             }
         }
     }
+}
 }
 
 data class SettingsScreenViewState(

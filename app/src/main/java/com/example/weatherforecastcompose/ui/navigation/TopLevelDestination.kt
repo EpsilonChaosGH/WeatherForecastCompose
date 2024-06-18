@@ -1,10 +1,5 @@
 package com.example.weatherforecastcompose.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.weatherforecastcompose.R
 
 
@@ -14,18 +9,18 @@ enum class TopLevelDestination(
     val iconTextId: Int,
 ) {
     Weather(
-        selectedIconId = R.drawable.ic_home,
-        unselectedIconId = R.drawable.ic_home,
+        selectedIconId = R.drawable.ic_sunny_selected,
+        unselectedIconId = R.drawable.ic_sunny_unselecred,
         iconTextId = R.string.weather_icon_text,
     ),
     Favorites(
-        selectedIconId = R.drawable.ic_baseline_favorite_24,
-        unselectedIconId = R.drawable.ic_baseline_favorite_border_24,
+        selectedIconId = R.drawable.ic_heart_selected,
+        unselectedIconId = R.drawable.ic_heart_unselected,
         iconTextId = R.string.favorites_icon_text,
     ),
     Settings(
-        selectedIconId = R.drawable.ic_settings,
-        unselectedIconId = R.drawable.ic_settings,
+        selectedIconId = R.drawable.ic_settings_selected,
+        unselectedIconId = R.drawable.ic_settings_unselected,
         iconTextId = R.string.settings_icon_text,
     ),
 }
