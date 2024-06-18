@@ -1,6 +1,5 @@
-package com.example.weatherforecastcompose.ui.screens.weather.components
+package com.example.weatherforecastcompose.ui.screens.favorites.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -21,8 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,11 +32,12 @@ import com.example.weatherforecastcompose.model.WeatherType
 import com.example.weatherforecastcompose.ui.theme.WeatherForecastComposeTheme
 
 @Composable
-internal fun WeatherCard(
+fun FavoriteItemCard(
     currentWeather: CurrentWeather,
     isFavorite: Boolean,
-    onFavoriteIconClick: (favoriteCoordinate: FavoriteCoordinates, isFavorite: Boolean) -> Unit
+    onFavoriteIconClick: (favoritesCoordinates: FavoriteCoordinates, isFavorite: Boolean) -> Unit
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -103,8 +101,8 @@ internal fun WeatherCard(
                 IconButton(onClick = {
                     onFavoriteIconClick(
                         FavoriteCoordinates(
-                            currentWeather.id,
-                            currentWeather.coordinates
+                            id = currentWeather.id,
+                            coordinates = currentWeather.coordinates
                         ),
                         isFavorite
                     )
@@ -126,7 +124,7 @@ internal fun WeatherCard(
 
 @Preview(showBackground = true)
 @Composable
-internal fun WeatherCardPreview() {
+internal fun FavoritesItemPreview() {
     WeatherForecastComposeTheme {
         Box(
 //            modifier = Modifier.paint(
@@ -134,7 +132,7 @@ internal fun WeatherCardPreview() {
 //                contentScale = ContentScale.FillBounds
 //            )
         ) {
-            WeatherCard(
+            FavoriteItemCard(
                 currentWeather = CurrentWeather(
                     id = 0,
                     coordinates = Coordinates(

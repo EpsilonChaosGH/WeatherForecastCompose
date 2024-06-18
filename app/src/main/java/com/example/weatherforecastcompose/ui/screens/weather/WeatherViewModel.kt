@@ -9,6 +9,7 @@ import com.example.weatherforecastcompose.data.local.SettingsRepository
 import com.example.weatherforecastcompose.mappers.toResourceId
 import com.example.weatherforecastcompose.model.City
 import com.example.weatherforecastcompose.model.ErrorType
+import com.example.weatherforecastcompose.model.FavoriteCoordinates
 import com.example.weatherforecastcompose.model.Settings
 import com.example.weatherforecastcompose.model.Weather
 import com.example.weatherforecastcompose.model.WeatherResult
@@ -67,7 +68,6 @@ class WeatherViewModel @Inject constructor(
 
     override fun obtainIntent(intent: WeatherScreenIntent) {
         when (intent) {
-            WeatherScreenIntent.ChangeFavorite -> changeFavorite()
 
             is WeatherScreenIntent.SearchInputChanged -> _state.update {
                 it.copy(searchInput = intent.value, searchError = false)
@@ -79,24 +79,28 @@ class WeatherViewModel @Inject constructor(
                 viewModelScope.launch { settings.setCoordinates(intent.value) }
             }
 
-            WeatherScreenIntent.RefreshWeather -> refreshWeather()
 
             is WeatherScreenIntent.SettingsChanged -> {
                 _state.update { it.copy(isLoading = true) }
                 getWeatherByCoordinates(intent.value)
             }
+
+            WeatherScreenIntent.RefreshScreenState -> refreshWeather()
+
+            is WeatherScreenIntent.AddToFavorites -> addToFavorite(intent.value)
+            is WeatherScreenIntent.RemoveFromFavorites -> removeFromFavorite(intent.value)
         }
     }
 
-    private fun changeFavorite() {
+    private fun addToFavorite(favoriteCoordinates: FavoriteCoordinates) {
         viewModelScope.launch {
-            state.value.weatherUiState?.let { weatherUiState ->
-                if (weatherUiState.isFavorite) {
-                    settings.removeFromFavorite(weatherUiState.weather.currentWeather.id)
-                } else {
-                    settings.addToFavorite(weatherUiState.weather.currentWeather.id)
-                }
-            }
+            settings.addToFavorite(favoriteCoordinates)
+        }
+    }
+
+    private fun removeFromFavorite(favoriteCoordinates: FavoriteCoordinates) {
+        viewModelScope.launch {
+            settings.removeFromFavorite(favoriteCoordinates)
         }
     }
 

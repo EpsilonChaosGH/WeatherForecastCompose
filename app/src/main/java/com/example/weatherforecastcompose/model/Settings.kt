@@ -4,5 +4,5 @@ data class Settings(
     val language: SupportedLanguage,
     val units: Units,
     val coordinates: Coordinates,
-    val favoriteSet: Set<Long>
+    val favoriteSet: Set<FavoriteCoordinates>
 )

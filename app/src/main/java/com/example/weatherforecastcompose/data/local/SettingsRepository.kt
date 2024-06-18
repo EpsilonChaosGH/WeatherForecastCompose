@@ -6,7 +6,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.weatherforecastcompose.Const
 import com.example.weatherforecastcompose.model.Coordinates
+import com.example.weatherforecastcompose.model.FavoriteCoordinates
 import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -60,24 +62,34 @@ class SettingsRepository @Inject constructor(
     }
 
 
-    private val favoriteSet = MutableStateFlow(mutableSetOf(1850144L))
+    private val favoriteSet = MutableStateFlow(
+        mutableSetOf(
+            FavoriteCoordinates(
+                1850144L,
+                Coordinates(lon = Const.DEFAULT_LON, lat = Const.DEFAULT_LAT)
+            )
+        )
+    )
 
     fun getFavoriteSet() = favoriteSet
 
-    suspend fun addToFavorite(id: Long) {
+    suspend fun addToFavorite(favoriteCoordinates: FavoriteCoordinates) {
         val set = favoriteSet.value.toMutableList()
-        set.add(id)
+        set.add(favoriteCoordinates)
         favoriteSet.emit(set.toMutableSet())
     }
 
-    suspend fun removeFromFavorite(id: Long) {
+    suspend fun removeFromFavorite(favoriteCoordinates: FavoriteCoordinates) {
         val set = favoriteSet.value.toMutableList()
-        set.remove(id)
+        set.remove(favoriteCoordinates)
         favoriteSet.emit(set.toMutableSet())
     }
 
     fun checkToFavorite(id: Long): Boolean {
-        return favoriteSet.value.contains(id)
+        favoriteSet.value.forEach {
+            if (it.id == id) return true
+        }
+        return false
     }
 
     companion object {

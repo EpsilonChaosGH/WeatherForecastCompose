@@ -14,11 +14,16 @@ import com.example.weatherforecastcompose.mappers.toForecastList
 import com.example.weatherforecastcompose.mappers.toWeather
 import com.example.weatherforecastcompose.model.City
 import com.example.weatherforecastcompose.model.Coordinates
+import com.example.weatherforecastcompose.model.CurrentWeather
 import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
 import com.example.weatherforecastcompose.model.Weather
 import com.example.weatherforecastcompose.model.WeatherResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -75,6 +80,30 @@ class WeatherRepository @Inject constructor(
                 }
             }
             WeatherResult.Success(coordinates)
+        } catch (e: Throwable) {
+            WeatherResult.Error(mapThrowableToErrorType(e))
+        }
+    }
+
+    suspend fun getFavoritesCurrentWeather(
+        coordinatesSet: Set<Coordinates>,
+        language: SupportedLanguage,
+        units: Units,
+    ): WeatherResult<List<CurrentWeather>> {
+        return try {
+            withContext(Dispatchers.IO) {
+                val list = coordinatesSet.map {
+                    async {
+                        weatherService.getCurrentWeatherByCoordinates(
+                            lat = it.lat,
+                            lon = it.lon,
+                            units = units.unitsValue,
+                            language = language.languageValue,
+                        ).responseToDate { toWeather(units = units) }
+                    }
+                }
+                WeatherResult.Success(list.awaitAll())
+            }
         } catch (e: Throwable) {
             WeatherResult.Error(mapThrowableToErrorType(e))
         }

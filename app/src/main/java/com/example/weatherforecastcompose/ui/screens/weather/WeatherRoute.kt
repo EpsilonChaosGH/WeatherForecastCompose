@@ -37,8 +37,11 @@ internal fun WeatherRoute(
         )
 
         WeatherScreen(
-            onFavoriteIconClick = { viewModel.obtainIntent(WeatherScreenIntent.ChangeFavorite) },
-            onRefresh = { viewModel.obtainIntent(WeatherScreenIntent.RefreshWeather) },
+            onFavoriteIconClick = { favoriteCoordinate, isFavorite ->
+                if (isFavorite) viewModel.obtainIntent(WeatherScreenIntent.RemoveFromFavorites(favoriteCoordinate))
+                else viewModel.obtainIntent(WeatherScreenIntent.AddToFavorites(favoriteCoordinate))
+            },
+            onRefresh = { viewModel.obtainIntent(WeatherScreenIntent.RefreshScreenState) },
             weatherViewState = uiState
         )
     }

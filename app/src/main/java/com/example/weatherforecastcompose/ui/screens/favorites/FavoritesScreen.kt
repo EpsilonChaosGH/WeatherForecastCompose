@@ -1,14 +1,85 @@
 package com.example.weatherforecastcompose.ui.screens.favorites
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import com.example.weatherforecastcompose.model.FavoriteCoordinates
+import com.example.weatherforecastcompose.ui.screens.favorites.components.FavoriteItemCard
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesScreen(
-    modifier: Modifier,
-    navController: NavController,
+internal fun FavoritesScreen(
+    favoritesViewState: FavoritesViewState,
+    onFavoriteIconClick: (favoritesCoordinates: FavoriteCoordinates, isFavorite: Boolean) -> Unit,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState = rememberLazyListState()
 ) {
 
-    FavoritesViewDisplay()
+    val pullToRefreshState = rememberPullToRefreshState()
+    Box(
+        modifier = modifier
+            .nestedScroll(pullToRefreshState.nestedScrollConnection)
+            .fillMaxSize()
+    ) {
+        if (favoritesViewState.favoritesUiState.isNotEmpty()) {
+            LazyColumn(
+                state = lazyListState,
+            ) {
+                favoritesViewState.favoritesUiState.forEach {
+                    item {
+                        FavoriteItemCard(
+                            currentWeather = it.currentWeather,
+                            isFavorite = it.isFavorite,
+                            onFavoriteIconClick = onFavoriteIconClick
+                        )
+                    }
+                }
+            }
+        }
+
+        if (favoritesViewState.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = MaterialTheme.colorScheme.surfaceTint
+            )
+        }
+
+        if (pullToRefreshState.isRefreshing) {
+            LaunchedEffect(true) {
+                onRefresh()
+                Log.e("aaaLK", "onRefresh()")
+            }
+        }
+
+        LaunchedEffect(favoritesViewState.isRefreshing) {
+            if (favoritesViewState.isRefreshing) {
+                pullToRefreshState.startRefresh()
+            } else {
+                pullToRefreshState.endRefresh()
+            }
+        }
+
+        if (pullToRefreshState.progress > 0 || pullToRefreshState.isRefreshing) {
+            PullToRefreshContainer(
+                state = pullToRefreshState,
+                modifier = Modifier
+                    .align(Alignment.TopCenter),
+            )
+        }
+    }
 }
