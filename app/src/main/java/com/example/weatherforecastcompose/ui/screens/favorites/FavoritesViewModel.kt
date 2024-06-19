@@ -3,19 +3,14 @@ package com.example.weatherforecastcompose.ui.screens.favorites
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecastcompose.Const
 import com.example.weatherforecastcompose.data.WeatherRepository
 import com.example.weatherforecastcompose.data.local.SettingsRepository
 import com.example.weatherforecastcompose.mappers.toResourceId
-import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
-import com.example.weatherforecastcompose.model.ErrorType
 import com.example.weatherforecastcompose.model.FavoriteCoordinates
 import com.example.weatherforecastcompose.model.Settings
 import com.example.weatherforecastcompose.model.WeatherResult
-import com.example.weatherforecastcompose.model.WeatherType
 import com.example.weatherforecastcompose.ui.screens.IntentHandler
-import com.example.weatherforecastcompose.ui.screens.weather.WeatherUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,7 +35,7 @@ class FavoritesViewModel @Inject constructor(
         settings.getCoordinates(),
         settings.getFavoriteSet()
     ) { language, units, coordinates, favoriteSet ->
-        Log.e("aaa_settingsFlow", "$language _ $units _ $coordinates")
+        Log.e("aaa_settingsFlowF", "$language _ $units _ $coordinates")
         Settings(
             language = language,
             units = units,

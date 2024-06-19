@@ -116,7 +116,7 @@ class WeatherRepository @Inject constructor(
     ): Weather {
 
         Log.e("aaaTESTER", coordinates.lat)
-        delay(1500)
+        delay(300)
 
         val currentWeather = weatherService.getCurrentWeatherByCoordinates(
             lat = coordinates.lat,
