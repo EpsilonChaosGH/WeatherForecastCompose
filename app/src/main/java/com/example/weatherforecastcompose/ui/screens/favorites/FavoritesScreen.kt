@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.example.weatherforecastcompose.R
-import com.example.weatherforecastcompose.model.FavoriteCoordinates
+import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.ui.screens.favorites.components.FavoriteItemCard
 import com.example.weatherforecastcompose.ui.screens.favorites.components.SwipeToDeleteContainer
 
@@ -28,7 +28,7 @@ import com.example.weatherforecastcompose.ui.screens.favorites.components.SwipeT
 @Composable
 internal fun FavoritesScreen(
     favoritesViewState: FavoritesViewState,
-    onFavoriteIconClick: (favoritesCoordinates: FavoriteCoordinates, isFavorite: Boolean) -> Unit,
+    onFavoriteIconClick: (favoritesCoordinates: FavoritesCoordinates, isFavorite: Boolean) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState()
@@ -55,7 +55,7 @@ internal fun FavoritesScreen(
                         item = favoritesUiState,
                         onDelete = {
                             onFavoriteIconClick(
-                                FavoriteCoordinates(
+                                FavoritesCoordinates(
                                     id = favoritesUiState.currentWeather.id,
                                     coordinates = favoritesUiState.currentWeather.coordinates,
                                 ), favoritesUiState.isFavorite
@@ -65,8 +65,10 @@ internal fun FavoritesScreen(
                     }
                 }
             }
-        } else {
-//            Text(text = stringResource(id = R.string.error_empty_favorites))
+        }
+
+        if (favoritesViewState.favoritesUiState.isEmpty() && !favoritesViewState.isLoading){
+            Text(text = stringResource(id = R.string.error_empty_favorites))
         }
 
         if (favoritesViewState.isLoading) {

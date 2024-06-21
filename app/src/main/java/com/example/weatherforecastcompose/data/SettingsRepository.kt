@@ -1,20 +1,16 @@
-package com.example.weatherforecastcompose.data.local
+package com.example.weatherforecastcompose.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.weatherforecastcompose.Const
 import com.example.weatherforecastcompose.model.Coordinates
-import com.example.weatherforecastcompose.model.FavoriteCoordinates
 import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,7 +23,6 @@ class SettingsRepository @Inject constructor(
     private val prefLanguage by lazy { stringPreferencesKey(KEY_LANGUAGE) }
     private val prefUnits by lazy { stringPreferencesKey(KEY_UNITS) }
     private val prefCoordinates by lazy { stringPreferencesKey(KEY_COORDINATES) }
-    private val prefFavorites by lazy { stringSetPreferencesKey(KEY_FAVORITES) }
 
 
     suspend fun setLanguage(language: SupportedLanguage) {
@@ -63,37 +58,6 @@ class SettingsRepository @Inject constructor(
         }
     }
 
-
-    private val favoriteSet = MutableStateFlow(
-        mutableSetOf(
-            FavoriteCoordinates(
-                1850144L,
-                Coordinates(lon = Const.DEFAULT_LON, lat = Const.DEFAULT_LAT)
-            )
-        )
-    )
-
-    fun getFavoriteSet() = favoriteSet
-
-    suspend fun addToFavorite(favoriteCoordinates: FavoriteCoordinates) {
-        val set = favoriteSet.value.toMutableList()
-        set.add(favoriteCoordinates)
-        favoriteSet.emit(set.toMutableSet())
-    }
-
-    suspend fun removeFromFavorite(favoriteCoordinates: FavoriteCoordinates) {
-        val set = favoriteSet.value.toMutableList()
-        set.remove(favoriteCoordinates)
-        favoriteSet.emit(set.toMutableSet())
-    }
-
-    fun checkToFavorite(id: Long): Boolean {
-        favoriteSet.value.forEach {
-            if (it.id == id) return true
-        }
-        return false
-    }
-
     companion object {
         // Tokyo coordinates
         const val DEFAULT_LON = "139.6917"
@@ -102,11 +66,9 @@ class SettingsRepository @Inject constructor(
         const val KEY_LANGUAGE = "language"
         const val KEY_UNITS = "units"
         const val KEY_COORDINATES = "coordinates"
-        const val KEY_FAVORITES = "favorites"
     }
 }
 
 val Context.dataStoreLanguage: DataStore<Preferences> by preferencesDataStore(name = "language")
 val Context.dataStoreUnits: DataStore<Preferences> by preferencesDataStore(name = "units")
 val Context.dataStoreCoordinates: DataStore<Preferences> by preferencesDataStore(name = "coordinates")
-val Context.dataStoreFavorites: DataStore<Preferences> by preferencesDataStore(name = "favorites")

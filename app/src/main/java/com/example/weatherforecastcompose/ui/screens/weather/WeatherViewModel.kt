@@ -4,12 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecastcompose.R
+import com.example.weatherforecastcompose.data.FavoritesRepository
 import com.example.weatherforecastcompose.data.WeatherRepository
-import com.example.weatherforecastcompose.data.local.SettingsRepository
+import com.example.weatherforecastcompose.data.SettingsRepository
 import com.example.weatherforecastcompose.mappers.toResourceId
 import com.example.weatherforecastcompose.model.City
 import com.example.weatherforecastcompose.model.ErrorType
-import com.example.weatherforecastcompose.model.FavoriteCoordinates
+import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.Settings
 import com.example.weatherforecastcompose.model.Weather
 import com.example.weatherforecastcompose.model.WeatherResult
@@ -29,14 +30,15 @@ import javax.inject.Inject
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val settings: SettingsRepository
+    private val settings: SettingsRepository,
+    private val favorites: FavoritesRepository,
 ) : ViewModel(), IntentHandler<WeatherScreenIntent> {
 
     private val _settingsFlow = combine(
         settings.getLanguage(),
         settings.getUnits(),
         settings.getCoordinates(),
-        settings.getFavoriteSet()
+        favorites.getFavoritesListFlow()
     ) { language, units, coordinates, favoriteSet ->
         Log.e("aaa_settingsFlow", "$language _ $units _ $coordinates")
         Settings(
@@ -92,15 +94,15 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    private fun addToFavorite(favoriteCoordinates: FavoriteCoordinates) {
+    private fun addToFavorite(favoritesCoordinates: FavoritesCoordinates) {
         viewModelScope.launch {
-            settings.addToFavorite(favoriteCoordinates)
+            favorites.addToFavorites(favoritesCoordinates)
         }
     }
 
-    private fun removeFromFavorite(favoriteCoordinates: FavoriteCoordinates) {
+    private fun removeFromFavorite(favoritesCoordinates: FavoritesCoordinates) {
         viewModelScope.launch {
-            settings.removeFromFavorite(favoriteCoordinates)
+            favorites.removeFromFavorites(favoritesCoordinates)
         }
     }
 
@@ -151,32 +153,34 @@ class WeatherViewModel @Inject constructor(
     }
 
     private fun processResult(result: WeatherResult<Weather>) {
-        when (result) {
-            is WeatherResult.Success -> {
-                val weatherData = result.data
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        isRefreshing = false,
-                        searchError = false,
-                        errorMessageId = null,
-                        weatherUiState = WeatherUiState(
-                            weather = weatherData,
-                            isFavorite = settings.checkToFavorite(weatherData.currentWeather.id)
+        viewModelScope.launch {
+            when (result) {
+                is WeatherResult.Success -> {
+                    val weatherData = result.data
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isRefreshing = false,
+                            searchError = false,
+                            errorMessageId = null,
+                            weatherUiState = WeatherUiState(
+                                weather = weatherData,
+                                isFavorite = favorites.checkForFavorite(weatherData.currentWeather.id)
+                            )
                         )
-                    )
+                    }
                 }
-            }
 
-            is WeatherResult.Error -> {
-                Log.e("aaa",result.errorType.name.toString())
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        isRefreshing = false,
-                        searchError = result.errorType == ErrorType.WRONG_CITY,
-                        errorMessageId = result.errorType.toResourceId(),
-                    )
+                is WeatherResult.Error -> {
+                    Log.e("aaa", result.errorType.name.toString())
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isRefreshing = false,
+                            searchError = result.errorType == ErrorType.WRONG_CITY,
+                            errorMessageId = result.errorType.toResourceId(),
+                        )
+                    }
                 }
             }
         }

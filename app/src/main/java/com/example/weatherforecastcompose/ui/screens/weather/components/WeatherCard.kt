@@ -1,6 +1,5 @@
 package com.example.weatherforecastcompose.ui.screens.weather.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -21,16 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.weatherforecastcompose.Const
 import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
-import com.example.weatherforecastcompose.model.FavoriteCoordinates
+import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.WeatherType
 import com.example.weatherforecastcompose.ui.theme.WeatherForecastComposeTheme
 
@@ -38,7 +34,7 @@ import com.example.weatherforecastcompose.ui.theme.WeatherForecastComposeTheme
 internal fun WeatherCard(
     currentWeather: CurrentWeather,
     isFavorite: Boolean,
-    onFavoriteIconClick: (favoriteCoordinate: FavoriteCoordinates, isFavorite: Boolean) -> Unit
+    onFavoriteIconClick: (favoriteCoordinate: FavoritesCoordinates, isFavorite: Boolean) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -102,7 +98,7 @@ internal fun WeatherCard(
                 )
                 IconButton(onClick = {
                     onFavoriteIconClick(
-                        FavoriteCoordinates(
+                        FavoritesCoordinates(
                             currentWeather.id,
                             currentWeather.coordinates
                         ),
@@ -138,8 +134,8 @@ internal fun WeatherCardPreview() {
                 currentWeather = CurrentWeather(
                     id = 0,
                     coordinates = Coordinates(
-                        lon = Const.DEFAULT_LON,
-                        lat = Const.DEFAULT_LAT
+                        lon = "139.6917",
+                        lat = "35.6895"
                     ),
                     city = "Moscow",
                     country = "RU",

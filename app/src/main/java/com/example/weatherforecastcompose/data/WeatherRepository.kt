@@ -1,6 +1,5 @@
 package com.example.weatherforecastcompose.data
 
-import android.util.Log
 import com.example.weatherforecastcompose.data.network.response.AirResponse
 import com.example.weatherforecastcompose.data.network.response.ForecastResponse
 import com.example.weatherforecastcompose.data.network.services.AirService
@@ -19,6 +18,7 @@ import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
 import com.example.weatherforecastcompose.model.Weather
 import com.example.weatherforecastcompose.model.WeatherResult
+import com.example.weatherforecastcompose.utils.WrongCityException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -52,23 +52,6 @@ class WeatherRepository @Inject constructor(
         }
     }
 
-//    suspend fun getWeather(
-//        city: City,
-//        units: Units,
-//        language: SupportedLanguage,
-//    ): WeatherResult<Weather> {
-//        return try {
-//            val weather = getWeatherByCoordinates(
-//                coordinates = getCoordinatesByCity(city),
-//                units = units,
-//                language = language
-//            )
-//            WeatherResult.Success(weather)
-//        } catch (e: Throwable) {
-//            WeatherResult.Error(mapThrowableToErrorType(e))
-//        }
-//    }
-
     suspend fun getCoordinatesByCity(city: City): WeatherResult<Coordinates> {
         return try {
             val coordinates = geocodingService.getCoordinatesByCity(city.city).responseToDate {
@@ -81,19 +64,18 @@ class WeatherRepository @Inject constructor(
             }
             WeatherResult.Success(coordinates)
         } catch (e: Throwable) {
-            Log.e("aaa",e.toString())
             WeatherResult.Error(mapThrowableToErrorType(e))
         }
     }
 
     suspend fun getFavoritesCurrentWeather(
-        coordinatesSet: Set<Coordinates>,
+        coordinatesList: List<Coordinates>,
         language: SupportedLanguage,
         units: Units,
     ): WeatherResult<List<CurrentWeather>> {
         return try {
             withContext(Dispatchers.IO) {
-                val list = coordinatesSet.map {
+                val list = coordinatesList.map {
                     async {
                         weatherService.getCurrentWeatherByCoordinates(
                             lat = it.lat,
@@ -116,7 +98,6 @@ class WeatherRepository @Inject constructor(
         language: SupportedLanguage,
     ): Weather {
 
-        Log.e("aaaTESTER", coordinates.lat)
         delay(300)
 
         val currentWeather = weatherService.getCurrentWeatherByCoordinates(

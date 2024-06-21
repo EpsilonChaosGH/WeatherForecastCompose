@@ -21,7 +21,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.weatherforecastcompose.model.FavoriteCoordinates
+import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.ui.screens.weather.components.AirCard
 import com.example.weatherforecastcompose.ui.screens.weather.components.ForecastCard
 import com.example.weatherforecastcompose.ui.screens.weather.components.SecondWeatherCard
@@ -30,7 +30,7 @@ import com.example.weatherforecastcompose.ui.screens.weather.components.WeatherC
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun WeatherScreen(
-    onFavoriteIconClick: (favoriteCoordinate: FavoriteCoordinates, isFavorite: Boolean) -> Unit,
+    onFavoriteIconClick: (favoriteCoordinate: FavoritesCoordinates, isFavorite: Boolean) -> Unit,
     onRefresh: () -> Unit,
     weatherViewState: WeatherViewState,
     modifier: Modifier = Modifier,

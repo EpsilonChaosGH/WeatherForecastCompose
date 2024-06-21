@@ -2,10 +2,10 @@ package com.example.weatherforecastcompose.mappers
 
 import androidx.annotation.StringRes
 import com.example.weatherforecastcompose.R
-import com.example.weatherforecastcompose.data.ClientException
-import com.example.weatherforecastcompose.data.GenericException
-import com.example.weatherforecastcompose.data.ServerException
-import com.example.weatherforecastcompose.data.WrongCityException
+import com.example.weatherforecastcompose.utils.ClientException
+import com.example.weatherforecastcompose.utils.GenericException
+import com.example.weatherforecastcompose.utils.ServerException
+import com.example.weatherforecastcompose.utils.WrongCityException
 import com.example.weatherforecastcompose.model.ErrorType
 import retrofit2.Response
 import java.io.IOException

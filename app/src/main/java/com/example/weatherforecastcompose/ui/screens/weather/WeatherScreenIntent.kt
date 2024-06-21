@@ -1,7 +1,7 @@
 package com.example.weatherforecastcompose.ui.screens.weather
 
 import com.example.weatherforecastcompose.model.Coordinates
-import com.example.weatherforecastcompose.model.FavoriteCoordinates
+import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.Settings
 
 
@@ -17,8 +17,8 @@ sealed interface WeatherScreenIntent {
 
     data object RefreshScreenState : WeatherScreenIntent
 
-    data class AddToFavorites(val value: FavoriteCoordinates) : WeatherScreenIntent
+    data class AddToFavorites(val value: FavoritesCoordinates) : WeatherScreenIntent
 
-    data class RemoveFromFavorites(val value: FavoriteCoordinates) : WeatherScreenIntent
+    data class RemoveFromFavorites(val value: FavoritesCoordinates) : WeatherScreenIntent
 
 }

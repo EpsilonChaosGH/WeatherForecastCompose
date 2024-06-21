@@ -3,7 +3,7 @@ package com.example.weatherforecastcompose.ui.screens.settings
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecastcompose.data.local.SettingsRepository
+import com.example.weatherforecastcompose.data.SettingsRepository
 import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
 import com.example.weatherforecastcompose.ui.screens.IntentHandler

@@ -1,7 +1,7 @@
 package com.example.weatherforecastcompose.data.network.services
 
 import com.example.weatherforecastcompose.data.network.response.ForecastResponse
-import com.example.weatherforecastcompose.Const
+import com.example.weatherforecastcompose.utils.AppConfig
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -14,6 +14,6 @@ interface ForecastService {
         @Query("lon") lon: String,
         @Query("lang") language: String,
         @Query("units") units: String,
-        @Query("cnt") cnt: String = Const.CNT
+        @Query("cnt") cnt: String = AppConfig.CNT
     ): Response<ForecastResponse>
 }

@@ -1,4 +1,4 @@
-package com.example.weatherforecastcompose.data
+package com.example.weatherforecastcompose.utils
 
 data class ClientException(override val message: String) : Throwable(message = message)
 

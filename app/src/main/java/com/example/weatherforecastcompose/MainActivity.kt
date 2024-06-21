@@ -1,9 +1,6 @@
 package com.example.weatherforecastcompose
 
-import android.content.Context
 import android.os.Bundle
-import android.util.AttributeSet
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,16 +18,5 @@ class MainActivity : ComponentActivity() {
                 AppNavHost()
             }
         }
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-    }
-
-    override fun onStart() {
-        super.onStart()
-    }
-    override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
-        return super.onCreateView(name, context, attrs)
     }
 }

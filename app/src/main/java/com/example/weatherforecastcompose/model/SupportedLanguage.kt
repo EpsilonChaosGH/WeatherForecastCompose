@@ -54,25 +54,4 @@ enum class SupportedLanguage(
     CHINESE_SIMPLIFIED("Chinese Simplified", R.drawable.flag_of_reoples_republic_of_china, "zh_cn"),
     CHINESE_TRADITIONAL("Chinese Traditional", R.drawable.flag_of_reoples_republic_of_china, "zh_tw"),
     ZULU("Zulu", R.drawable.flag_of_south_africa, "zu");
-
-    companion object {
-        fun getLanguageSpinnerItem(): Array<SpinnerItem> {
-            return SupportedLanguage.values().map {
-                SpinnerItem(it.languageName, it.iconResId)
-            }.toTypedArray()
-        }
-
-        fun getLanguageValue(index: Int): String {
-            return SupportedLanguage.values()[index].languageValue
-        }
-
-        fun getIndex(value: String): Int {
-            var result = 0
-             SupportedLanguage.values().forEachIndexed { index, language ->
-                  if (language.languageValue == value) result = index
-             }
-            return result
-        }
-
-    }
 }

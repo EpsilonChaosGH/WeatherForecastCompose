@@ -1,10 +1,11 @@
 package com.example.weatherforecastcompose.di
 
-import com.example.weatherforecastcompose.Const
+import com.example.weatherforecastcompose.utils.AppId
 import com.example.weatherforecastcompose.data.network.services.AirService
 import com.example.weatherforecastcompose.data.network.services.ForecastService
 import com.example.weatherforecastcompose.data.network.services.GeocodingService
 import com.example.weatherforecastcompose.data.network.services.WeatherService
+import com.example.weatherforecastcompose.utils.AppConfig
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -49,7 +50,7 @@ object NetworkModule {
     fun provideInterceptor(): Interceptor {
         return Interceptor { chain ->
             val request = chain.request()
-            val url = request.url.newBuilder().addQueryParameter("appid", Const.APP_ID).build()
+            val url = request.url.newBuilder().addQueryParameter("appid", AppId.APP_ID).build()
             chain.proceed(request.newBuilder().url(url).build())
         }
     }
@@ -72,7 +73,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Const.BASE_URL)
+            .baseUrl(AppConfig.BASE_URL)
             .client(client)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()

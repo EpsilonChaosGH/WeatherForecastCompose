@@ -3,11 +3,12 @@ package com.example.weatherforecastcompose.ui.screens.favorites
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.weatherforecastcompose.data.FavoritesRepository
 import com.example.weatherforecastcompose.data.WeatherRepository
-import com.example.weatherforecastcompose.data.local.SettingsRepository
+import com.example.weatherforecastcompose.data.SettingsRepository
 import com.example.weatherforecastcompose.mappers.toResourceId
 import com.example.weatherforecastcompose.model.CurrentWeather
-import com.example.weatherforecastcompose.model.FavoriteCoordinates
+import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.Settings
 import com.example.weatherforecastcompose.model.WeatherResult
 import com.example.weatherforecastcompose.ui.screens.IntentHandler
@@ -26,14 +27,15 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val settings: SettingsRepository
+    private val settings: SettingsRepository,
+    private val favorites: FavoritesRepository
 ) : ViewModel(), IntentHandler<FavoritesScreenIntent> {
 
     private val _settingsFlow = combine(
         settings.getLanguage(),
         settings.getUnits(),
         settings.getCoordinates(),
-        settings.getFavoriteSet()
+        favorites.getFavoritesListFlow()
     ) { language, units, coordinates, favoriteSet ->
         Log.e("aaa_settingsFlowF", "$language _ $units _ $coordinates")
         Settings(
@@ -70,15 +72,15 @@ class FavoritesViewModel @Inject constructor(
         }
     }
 
-    private fun addToFavorite(favoriteCoordinates: FavoriteCoordinates) {
+    private fun addToFavorite(favoritesCoordinates: FavoritesCoordinates) {
         viewModelScope.launch {
-            settings.addToFavorite(favoriteCoordinates)
+            favorites.addToFavorites(favoritesCoordinates)
         }
     }
 
-    private fun removeFromFavorite(favoriteCoordinates: FavoriteCoordinates) {
+    private fun removeFromFavorite(favoritesCoordinates: FavoritesCoordinates) {
         viewModelScope.launch {
-            settings.removeFromFavorite(favoriteCoordinates)
+            favorites.removeFromFavorites(favoritesCoordinates)
         }
     }
 
@@ -93,7 +95,7 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             val settings = _settingsFlow.first()
             val response = weatherRepository.getFavoritesCurrentWeather(
-                settings.favoriteSet.map { it.coordinates }.toSet(),
+                settings.favoriteSet.map { it.coordinates },
                 language = settings.language,
                 units = settings.units
             )

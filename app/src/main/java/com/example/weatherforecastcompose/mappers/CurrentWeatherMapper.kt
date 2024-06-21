@@ -1,7 +1,7 @@
 package com.example.weatherforecastcompose.mappers
 
-import com.example.weatherforecastcompose.data.FORMAT_EEE_d_MMMM_HH_mm
-import com.example.weatherforecastcompose.data.format
+import com.example.weatherforecastcompose.utils.FORMAT_EEE_d_MMMM_HH_mm
+import com.example.weatherforecastcompose.utils.format
 import com.example.weatherforecastcompose.data.network.response.CurrentWeatherResponse
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
