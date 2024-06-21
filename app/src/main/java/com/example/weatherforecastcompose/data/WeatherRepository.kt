@@ -81,6 +81,7 @@ class WeatherRepository @Inject constructor(
             }
             WeatherResult.Success(coordinates)
         } catch (e: Throwable) {
+            Log.e("aaa",e.toString())
             WeatherResult.Error(mapThrowableToErrorType(e))
         }
     }

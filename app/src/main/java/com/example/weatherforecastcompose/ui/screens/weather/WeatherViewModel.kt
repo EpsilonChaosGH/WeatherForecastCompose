@@ -169,6 +169,7 @@ class WeatherViewModel @Inject constructor(
             }
 
             is WeatherResult.Error -> {
+                Log.e("aaa",result.errorType.name.toString())
                 _state.update {
                     it.copy(
                         isLoading = false,

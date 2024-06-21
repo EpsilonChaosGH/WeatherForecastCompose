@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.weatherforecastcompose.Const
 import com.example.weatherforecastcompose.model.Coordinates
@@ -26,6 +27,7 @@ class SettingsRepository @Inject constructor(
     private val prefLanguage by lazy { stringPreferencesKey(KEY_LANGUAGE) }
     private val prefUnits by lazy { stringPreferencesKey(KEY_UNITS) }
     private val prefCoordinates by lazy { stringPreferencesKey(KEY_COORDINATES) }
+    private val prefFavorites by lazy { stringSetPreferencesKey(KEY_FAVORITES) }
 
 
     suspend fun setLanguage(language: SupportedLanguage) {
@@ -100,9 +102,11 @@ class SettingsRepository @Inject constructor(
         const val KEY_LANGUAGE = "language"
         const val KEY_UNITS = "units"
         const val KEY_COORDINATES = "coordinates"
+        const val KEY_FAVORITES = "favorites"
     }
 }
 
 val Context.dataStoreLanguage: DataStore<Preferences> by preferencesDataStore(name = "language")
 val Context.dataStoreUnits: DataStore<Preferences> by preferencesDataStore(name = "units")
 val Context.dataStoreCoordinates: DataStore<Preferences> by preferencesDataStore(name = "coordinates")
+val Context.dataStoreFavorites: DataStore<Preferences> by preferencesDataStore(name = "favorites")
