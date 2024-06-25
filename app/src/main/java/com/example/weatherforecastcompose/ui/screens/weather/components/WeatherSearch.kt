@@ -34,7 +34,7 @@ internal fun WeatherSearch(
     weatherViewState: WeatherViewState,
     onSearchInputChanged: (String) -> Unit,
     onSearchDoneClick: () -> Unit,
-    onLocationClick: (coordinates: Coordinates) -> Unit
+    onLocationClick: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManger = LocalFocusManager.current
@@ -93,11 +93,7 @@ internal fun WeatherSearch(
 
             },
             trailingIcon = {
-                IconButton(onClick = {
-                    onLocationClick(
-                        Coordinates("0.0", "0.0")
-                    )
-                }) {
+                IconButton(onClick = onLocationClick) {
                     Icon(
                         modifier = Modifier.size(40.dp),
 //                        tint = MaterialTheme.colorScheme.onSurface,

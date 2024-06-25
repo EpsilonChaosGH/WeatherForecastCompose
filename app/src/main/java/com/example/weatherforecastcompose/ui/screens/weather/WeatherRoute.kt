@@ -12,6 +12,7 @@ import com.example.weatherforecastcompose.ui.screens.weather.components.WeatherS
 
 @Composable
 internal fun WeatherRoute(
+    onLocationClick: () -> Unit,
     modifier: Modifier,
     navController: NavController,
     viewModel: WeatherViewModel = hiltViewModel()
@@ -24,21 +25,19 @@ internal fun WeatherRoute(
         WeatherSearch(
             weatherViewState = uiState,
             onSearchInputChanged = { searchInputValue ->
-                viewModel.obtainIntent(
-                    WeatherScreenIntent.SearchInputChanged(
-                        searchInputValue
-                    )
-                )
+                viewModel.obtainIntent(WeatherScreenIntent.SearchInputChanged(searchInputValue))
             },
             onSearchDoneClick = { viewModel.obtainIntent(WeatherScreenIntent.SearchWeatherByCity) },
-            onLocationClick = { coordinates ->
-                viewModel.obtainIntent(WeatherScreenIntent.SearchWeatherByCoordinates(coordinates))
-            }
+            onLocationClick = onLocationClick
         )
 
         WeatherScreen(
             onFavoriteIconClick = { favoriteCoordinate, isFavorite ->
-                if (isFavorite) viewModel.obtainIntent(WeatherScreenIntent.RemoveFromFavorites(favoriteCoordinate))
+                if (isFavorite) viewModel.obtainIntent(
+                    WeatherScreenIntent.RemoveFromFavorites(
+                        favoriteCoordinate
+                    )
+                )
                 else viewModel.obtainIntent(WeatherScreenIntent.AddToFavorites(favoriteCoordinate))
             },
             onRefresh = { viewModel.obtainIntent(WeatherScreenIntent.RefreshScreenState) },

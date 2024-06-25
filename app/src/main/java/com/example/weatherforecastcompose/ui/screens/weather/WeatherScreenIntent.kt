@@ -13,6 +13,8 @@ sealed interface WeatherScreenIntent {
 
     data class SearchWeatherByCoordinates(val value: Coordinates) : WeatherScreenIntent
 
+    data object PermissionsDenied : WeatherScreenIntent
+
     data class SearchInputChanged(val value: String) : WeatherScreenIntent
 
     data object RefreshScreenState : WeatherScreenIntent

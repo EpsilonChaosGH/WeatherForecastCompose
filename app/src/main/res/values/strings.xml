@@ -6,7 +6,7 @@
     <string name="settings_icon_text">Settings</string>
 
 
-<!--    Image content Description-->
+    <!--    Image content Description-->
     <string name="image_content_description_city">City</string>
     <string name="image_content_description_date">Date</string>
     <string name="image_content_description_is_favorite">Favorite</string>
@@ -31,6 +31,13 @@
 
     <string name="bt_save">Save</string>
 
+    <!--    Permissions-->
+    <string name="location_rationale_title">Permission Request</string>
+    <string name="location_rationale_description">Hey there, we need location permission to show you relevant / accurate weather information.</string>
+    <string name="location_rationale_button_grant">Allow</string>
+    <string name="location_rationale_button_deny">Deny</string>
+    <string name="location_no_permission_screen_description">You need to grant location access to use the app</string>
+    <string name="location_settings_not_enabled">Check your location settings and enable them</string>
 
     <string name="error_client">Oops,something fishy is up on your end :)</string>
     <string name="error_server">Oops! Something is wrong on our end :(</string>

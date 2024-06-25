@@ -22,8 +22,7 @@ object RoomModule {
             context,
             AppDatabase::class.java,
             "WeatherApp-DB"
-        )
-            .build()
+        ).build()
 
     @Provides
     @Singleton

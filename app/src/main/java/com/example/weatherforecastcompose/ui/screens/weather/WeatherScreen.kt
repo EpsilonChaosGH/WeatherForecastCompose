@@ -1,8 +1,13 @@
 package com.example.weatherforecastcompose.ui.screens.weather
 
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -19,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherforecastcompose.model.FavoritesCoordinates
@@ -82,6 +88,10 @@ internal fun WeatherScreen(
             }
         }
 
+        if (weatherViewState.errorMessageId != null) {
+//            ErrorScreen(state.errorMessageId, onTryAgainClicked)
+        }
+
         if (weatherViewState.isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -138,3 +148,37 @@ internal fun WeatherLoading(
         }
     }
 }
+
+//@Composable
+//fun ColumnScope.ErrorScreen(errorMsgId: Int, onTryAgainClicked: () -> Unit) {
+//    Spacer(modifier = Modifier.weight(WeatherAppTheme.weight.HALF))
+//    ActionErrorMessage(
+//        errorMessageId = errorMsgId,
+//        modifier = Modifier.padding(WeatherAppTheme.dimens.medium)
+//    ) {
+//        onTryAgainClicked()
+//    }
+//    Spacer(modifier = Modifier.weight(WeatherAppTheme.weight.HALF))
+//}
+//
+//@Composable
+//fun ActionErrorMessage(
+//    @StringRes errorMessageId: Int,
+//    modifier: Modifier,
+//    onTryAgainClicked: () -> Unit,
+//) {
+//    Column(modifier = Modifier.fillMaxWidth()) {
+//        MediumBody(
+//            text = stringResource(id = errorMessageId),
+//            textAlign = TextAlign.Center,
+//            modifier = modifier.align(Alignment.CenterHorizontally),
+//        )
+//        PositiveButton(
+//            text = stringResource(id = R.string.home_error_try_again),
+//            onClick = { onTryAgainClicked() },
+//            modifier = Modifier
+//                .padding(WeatherAppTheme.dimens.medium)
+//                .align(Alignment.CenterHorizontally)
+//        )
+//    }
+//}

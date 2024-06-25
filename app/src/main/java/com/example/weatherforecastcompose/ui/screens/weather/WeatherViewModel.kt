@@ -91,6 +91,7 @@ class WeatherViewModel @Inject constructor(
 
             is WeatherScreenIntent.AddToFavorites -> addToFavorite(intent.value)
             is WeatherScreenIntent.RemoveFromFavorites -> removeFromFavorite(intent.value)
+            WeatherScreenIntent.PermissionsDenied -> TODO()
         }
     }
 

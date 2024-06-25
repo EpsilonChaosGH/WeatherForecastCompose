@@ -19,12 +19,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.ui.screens.favorites.FavoritesRoute
 import com.example.weatherforecastcompose.ui.screens.settings.SettingsScreen
 import com.example.weatherforecastcompose.ui.screens.weather.WeatherRoute
 
 @Composable
 fun AppNavHost(
+    onLocationClick: () -> Unit,
     navController: NavHostController = rememberNavController(),
 ) {
     Scaffold(
@@ -91,6 +93,7 @@ fun AppNavHost(
         ) {
             composable(TopLevelDestination.Weather.name) {
                 WeatherRoute(
+                    onLocationClick = onLocationClick,
                     navController = navController,
                     modifier = Modifier.padding(paddingValues)
                 )
