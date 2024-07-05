@@ -1,4 +1,4 @@
-package com.example.weatherforecastcompose.ui.theme
+package com.example.weatherforecastcompose.designsystem
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.dp
@@ -10,6 +10,7 @@ object Dimensions {
     val medium = 16.dp
     val large = 24.dp
     val extraLarge = 32.dp
+    val ultraLarge = 40.dp
 }
 
 object Weight {

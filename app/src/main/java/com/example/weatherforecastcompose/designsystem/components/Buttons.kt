@@ -1,4 +1,4 @@
-package com.example.weatherforecastcompose.designsystem
+package com.example.weatherforecastcompose.designsystem.components
 
 import androidx.compose.foundation.background
 import androidx.compose.material3.Button

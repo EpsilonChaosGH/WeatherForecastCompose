@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.weatherforecastcompose.ui.navigation.TopLevelDestination
 
 @Composable
 fun FavoritesRoute(
@@ -18,6 +19,12 @@ fun FavoritesRoute(
 
     FavoritesScreen(
         favoritesViewState = uiState,
+        onItemClick = {
+            viewModel.obtainIntent(FavoritesScreenIntent.SetCoordinates(it))
+            navController.navigate(TopLevelDestination.Weather.name) {
+                popUpTo(0) { inclusive = true }
+            }
+        },
         onFavoriteIconClick = { favoritesCoordinates, isFavorite ->
             if (isFavorite) viewModel.obtainIntent(
                 FavoritesScreenIntent.RemoveFromFavorites(

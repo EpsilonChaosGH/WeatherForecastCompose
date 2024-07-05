@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.model.Air
 import com.example.weatherforecastcompose.model.AirQuality
-import com.example.weatherforecastcompose.ui.theme.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 
 @SuppressLint("ResourceType")
 @Composable

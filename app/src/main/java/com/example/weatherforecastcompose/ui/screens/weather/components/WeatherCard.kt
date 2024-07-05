@@ -28,7 +28,7 @@ import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
 import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.WeatherType
-import com.example.weatherforecastcompose.ui.theme.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 
 @Composable
 internal fun WeatherCard(

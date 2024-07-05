@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.example.weatherforecastcompose.R
+import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.ui.screens.favorites.components.FavoriteItemCard
 import com.example.weatherforecastcompose.ui.screens.favorites.components.SwipeToDeleteContainer
@@ -28,6 +29,7 @@ import com.example.weatherforecastcompose.ui.screens.favorites.components.SwipeT
 @Composable
 internal fun FavoritesScreen(
     favoritesViewState: FavoritesViewState,
+    onItemClick: (coordinates: Coordinates) -> Unit,
     onFavoriteIconClick: (favoritesCoordinates: FavoritesCoordinates, isFavorite: Boolean) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
@@ -61,7 +63,9 @@ internal fun FavoritesScreen(
                                 ), favoritesUiState.isFavorite
                             )
                         }) {
-                        FavoriteItemCard(currentWeather = it.currentWeather)
+                        FavoriteItemCard(currentWeather = it.currentWeather, onCardClick = {
+                            onItemClick(favoritesUiState.currentWeather.coordinates)
+                        })
                     }
                 }
             }

@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
-import com.example.weatherforecastcompose.ui.theme.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 
 @Composable
 fun SettingOptionRow(

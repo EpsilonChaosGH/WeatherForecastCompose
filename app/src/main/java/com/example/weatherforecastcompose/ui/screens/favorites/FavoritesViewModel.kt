@@ -3,10 +3,12 @@ package com.example.weatherforecastcompose.ui.screens.favorites
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.weatherforecastcompose.data.FavoritesRepository
 import com.example.weatherforecastcompose.data.WeatherRepository
 import com.example.weatherforecastcompose.data.SettingsRepository
 import com.example.weatherforecastcompose.mappers.toResourceId
+import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
 import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.Settings
@@ -69,6 +71,13 @@ class FavoritesViewModel @Inject constructor(
             is FavoritesScreenIntent.AddToFavorites -> addToFavorite(intent.value)
             is FavoritesScreenIntent.RemoveFromFavorites -> removeFromFavorite(intent.value)
             is FavoritesScreenIntent.SettingsChanged -> getFavoritesCurrentWeather()
+            is FavoritesScreenIntent.SetCoordinates -> setCoordinates(intent.value)
+        }
+    }
+
+    private fun setCoordinates(coordinates: Coordinates){
+        viewModelScope.launch {
+            settings.setCoordinates(coordinates)
         }
     }
 

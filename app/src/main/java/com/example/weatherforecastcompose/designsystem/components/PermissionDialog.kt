@@ -1,4 +1,4 @@
-package com.example.weatherforecastcompose.ui
+package com.example.weatherforecastcompose.designsystem.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

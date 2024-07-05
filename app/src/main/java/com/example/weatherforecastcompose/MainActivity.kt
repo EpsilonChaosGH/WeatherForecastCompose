@@ -16,10 +16,10 @@ import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.weatherforecastcompose.model.Coordinates
-import com.example.weatherforecastcompose.ui.CoarseLocationPermissionTextProvider
-import com.example.weatherforecastcompose.ui.PermissionDialog
+import com.example.weatherforecastcompose.designsystem.components.CoarseLocationPermissionTextProvider
+import com.example.weatherforecastcompose.designsystem.components.PermissionDialog
 import com.example.weatherforecastcompose.ui.navigation.AppNavHost
-import com.example.weatherforecastcompose.ui.theme.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
                     isGranted = isGranted
                 )
             )
+            if (isGranted) getCurrentCoordinate()
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {

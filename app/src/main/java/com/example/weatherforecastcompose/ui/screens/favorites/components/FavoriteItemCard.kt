@@ -1,5 +1,6 @@
 package com.example.weatherforecastcompose.ui.screens.favorites.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -24,15 +25,17 @@ import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
 import com.example.weatherforecastcompose.model.WeatherType
-import com.example.weatherforecastcompose.ui.theme.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 
 @Composable
 fun FavoriteItemCard(
     currentWeather: CurrentWeather,
+    onCardClick: () -> Unit,
 ) {
 
     Card(
         modifier = Modifier
+            .clickable { onCardClick() }
             .fillMaxWidth()
             .padding(
                 start = 20.dp,
@@ -113,6 +116,7 @@ internal fun FavoritesItemPreview() {
                 data = "Wed,19 June 15:54",
                 timezone = 0,
             ),
+            onCardClick = {}
         )
     }
 }
