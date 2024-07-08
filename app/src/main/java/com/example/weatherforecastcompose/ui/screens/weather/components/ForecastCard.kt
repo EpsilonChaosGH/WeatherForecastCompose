@@ -14,9 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
+import com.example.weatherforecastcompose.designsystem.WeatherAppTheme
 import com.example.weatherforecastcompose.model.Forecast
 import com.example.weatherforecastcompose.model.WeatherType
 import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
@@ -27,26 +29,23 @@ internal fun ForecastCard(forecastList: List<Forecast>) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                start = 20.dp,
-                top = 10.dp,
-                end = 20.dp,
-                bottom = 10.dp
-            ),
-//        colors = CardDefaults.cardColors(
-//            containerColor = MaterialTheme.colorScheme.surface,
-//        ),
+                start = WeatherAppTheme.dimens.medium,
+                top = WeatherAppTheme.dimens.small,
+                end = WeatherAppTheme.dimens.medium,
+                bottom = WeatherAppTheme.dimens.small
+            )
     ) {
         forecastList.forEachIndexed { index, item ->
             ForecastItemCard(
-                iconId = item.weatherType.iconResId,
-                day = item.data,
+                iconResId = item.weatherType.iconResId,
+                descriptionResId = item.weatherType.descResId,
+                date = item.data,
                 humidity = item.humidity,
                 temperature = item.temperature
             )
             if (forecastList.size != index + 1) {
                 HorizontalDivider(
-                    modifier = Modifier.padding(start = 20.dp, end = 20.dp),
-//                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = WeatherAppTheme.dimens.medium),
                     thickness = 1.dp
                 )
             }
@@ -56,52 +55,46 @@ internal fun ForecastCard(forecastList: List<Forecast>) {
 
 @Composable
 internal fun ForecastItemCard(
-    iconId: Int,
-    day: String,
+    iconResId: Int,
+    descriptionResId: Int,
+    date: String,
     humidity: String,
     temperature: String,
 ) {
     Row(
         modifier = Modifier
-            .padding(10.dp)
+            .padding(WeatherAppTheme.dimens.small)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Icon(
-            modifier = Modifier
-                .size(60.dp),
-//            tint = MaterialTheme.colorScheme.onSurface,
-            painter = painterResource(iconId),
-            contentDescription = "weather icon",
+            modifier = Modifier.size(60.dp),
+            painter = painterResource(iconResId),
+            contentDescription = stringResource(descriptionResId),
         )
         Text(
-            text = day,
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
+            text = date,
+            modifier = Modifier.align(Alignment.CenterVertically)
         )
         Row(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically)
         ) {
             Text(text = humidity)
             Icon(
-                modifier = Modifier.size(24.dp),
-//                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(WeatherAppTheme.dimens.large),
                 painter = painterResource(R.drawable.ic_weather_humidity),
-                contentDescription = "weather icon",
+                contentDescription = stringResource(R.string.image_content_description_humidity),
             )
         }
         Row(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically)
         ) {
             Text(text = temperature)
             Icon(
-                modifier = Modifier.size(24.dp),
-//                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(WeatherAppTheme.dimens.large),
                 painter = painterResource(R.drawable.ic_weather_thermometer),
-                contentDescription = "weather icon",
+                contentDescription = stringResource(R.string.image_content_description_temperature),
             )
         }
     }
@@ -111,12 +104,7 @@ internal fun ForecastItemCard(
 @Composable
 internal fun ForecastCardPreview() {
     WeatherForecastComposeTheme {
-        Column(
-//            modifier = Modifier.paint(
-//                painterResource(id = R.drawable.sky_wallpaper),
-//                contentScale = ContentScale.FillBounds
-//            )
-        ) {
+        Column {
             ForecastCard(
                 listOf(
                     Forecast(

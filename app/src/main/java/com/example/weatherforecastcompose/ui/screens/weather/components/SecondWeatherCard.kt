@@ -6,67 +6,65 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
+import com.example.weatherforecastcompose.designsystem.WeatherAppTheme
+import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
 import com.example.weatherforecastcompose.model.WeatherType
-import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 
 @Composable
-internal fun SecondWeatherCard(
-    currentWeather: CurrentWeather
-) {
+internal fun SecondWeatherCard(currentWeather: CurrentWeather) {
     Row {
         SmallCard(
-            modifier = Modifier
-                .weight(1f)
-                .padding(
-                    start = 20.dp,
-                    top = 10.dp,
-                    end = 5.dp,
-                ),
-            titleResId = R.string.title_feels_like,
             value = currentWeather.feelsLike,
-            iconId = R.drawable.ic_weather_thermometer
+            titleResId = R.string.title_feels_like,
+            iconResId = R.drawable.ic_weather_thermometer,
+            modifier = Modifier
+                .weight(WeatherAppTheme.weight.FULL)
+                .padding(
+                    start = WeatherAppTheme.dimens.medium,
+                    top = WeatherAppTheme.dimens.small,
+                    end = WeatherAppTheme.dimens.extraSmall,
+                ),
         )
         SmallCard(
-            modifier = Modifier
-                .weight(1f)
-                .padding(
-                    start = 5.dp,
-                    top = 10.dp,
-                    end = 20.dp,
-                ),
-            titleResId = R.string.title_humidity,
             value = currentWeather.humidity,
-            iconId = R.drawable.ic_weather_humidity
+            titleResId = R.string.title_humidity,
+            iconResId = R.drawable.ic_weather_humidity,
+            modifier = Modifier
+                .weight(WeatherAppTheme.weight.FULL)
+                .padding(
+                    start = WeatherAppTheme.dimens.extraSmall,
+                    top = WeatherAppTheme.dimens.small,
+                    end = WeatherAppTheme.dimens.medium,
+                ),
         )
     }
     Row {
         SmallCard(
-            modifier = Modifier
-                .weight(1f)
-                .padding(
-                    start = 20.dp,
-                    top = 10.dp,
-                    end = 5.dp,
-                ),
-            titleResId = R.string.title_pressure,
             value = currentWeather.pressure,
-            iconId = R.drawable.ic_weather_barometer
+            titleResId = R.string.title_pressure,
+            iconResId = R.drawable.ic_weather_barometer,
+            modifier = Modifier
+                .weight(WeatherAppTheme.weight.FULL)
+                .padding(
+                    start = WeatherAppTheme.dimens.medium,
+                    top = WeatherAppTheme.dimens.small,
+                    end = WeatherAppTheme.dimens.extraSmall,
+                ),
         )
         SmallCard(
-            modifier = Modifier
-                .weight(1f)
-                .padding(
-                    start = 5.dp,
-                    top = 10.dp,
-                    end = 20.dp,
-                ),
-            titleResId = R.string.title_wind_speed,
             value = currentWeather.windSpeed,
-            iconId = R.drawable.ic_weather_wind
+            titleResId = R.string.title_wind_speed,
+            iconResId = R.drawable.ic_weather_wind,
+            modifier = Modifier
+                .weight(WeatherAppTheme.weight.FULL)
+                .padding(
+                    start = WeatherAppTheme.dimens.extraSmall,
+                    top = WeatherAppTheme.dimens.small,
+                    end = WeatherAppTheme.dimens.medium,
+                ),
         )
     }
 }
@@ -75,12 +73,7 @@ internal fun SecondWeatherCard(
 @Composable
 internal fun SecondWeatherCardPreview() {
     WeatherForecastComposeTheme {
-        Column(
-//            modifier = Modifier.paint(
-//                painterResource(id = R.drawable.sky_wallpaper),
-//                contentScale = ContentScale.FillBounds
-//            )
-        ) {
+        Column {
             SecondWeatherCard(
                 currentWeather = CurrentWeather(
                     id = 0,

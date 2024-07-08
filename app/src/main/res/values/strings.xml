@@ -12,6 +12,8 @@
     <string name="image_content_description_is_favorite">Favorite</string>
     <string name="image_content_description_search">Search weather</string>
     <string name="image_content_description_search_error">Search weather error</string>
+    <string name="image_content_description_humidity">Humidity</string>
+    <string name="image_content_description_temperature">Temperature</string>
 
 
     <string name="title_search">Search</string>
@@ -57,7 +59,7 @@
     <string name="error">Error</string>
 
 
-    <!-- Weather.kt icons -->
+    <!-- Weather icons -->
     <string name="clear_sky">01d</string>
     <string name="few_clouds">02d</string>
     <string name="scattered_clouds">03d</string>
@@ -68,7 +70,7 @@
     <string name="snow">13d</string>
     <string name="mist">50d</string>
 
-    <!-- Weather.kt night icons -->
+    <!-- Weather night icons -->
     <string name="clear_sky_night">01n</string>
     <string name="few_clouds_night">02n</string>
     <string name="scattered_clouds_night">03n</string>

@@ -25,10 +25,10 @@ import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeThe
 
 @Composable
 internal fun SmallCard(
-    modifier: Modifier,
-    titleResId: Int,
     value: String,
-    iconId: Int,
+    titleResId: Int,
+    iconResId: Int,
+    modifier: Modifier,
     iconColor: Color = LocalContentColor.current
 ) {
     Card(modifier = modifier) {
@@ -41,12 +41,15 @@ internal fun SmallCard(
                     text = stringResource(id = titleResId),
                     style = MaterialTheme.typography.titleMedium
                 )
-                Text(text = value, style = MaterialTheme.typography.titleLarge)
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.titleLarge
+                )
             }
             Icon(
                 modifier = Modifier.size(WeatherAppTheme.dimens.ultraLarge),
                 tint = iconColor,
-                painter = painterResource(iconId),
+                painter = painterResource(iconResId),
                 contentDescription = stringResource(id = titleResId),
             )
         }
@@ -59,12 +62,12 @@ internal fun SmallCardPreview() {
     WeatherForecastComposeTheme {
         Column {
             SmallCard(
+                value = "122 μg/m3",
+                titleResId = R.string.title_pm10,
+                iconResId = R.drawable.ic_air_good,
                 modifier = Modifier
                     .width(210.dp)
                     .padding(20.dp),
-                titleResId = R.string.title_pm10,
-                value = "122asd",
-                iconId = R.drawable.ic_air_good,
                 iconColor = colorResource(R.color.orange)
             )
         }
