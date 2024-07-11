@@ -25,12 +25,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
-import com.example.weatherforecastcompose.ui.screens.weather.WeatherViewState
+import com.example.weatherforecastcompose.designsystem.WeatherAppTheme
 import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 
 @Composable
 internal fun WeatherSearch(
-    weatherViewState: WeatherViewState,
+    searchInput: String,
+    searchError: Boolean,
+    errorMessageResId: Int?,
     onSearchInputChanged: (String) -> Unit,
     onSearchDoneClick: () -> Unit,
     onLocationClick: () -> Unit
@@ -42,42 +44,36 @@ internal fun WeatherSearch(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                start = 20.dp,
-                top = 20.dp,
-                end = 20.dp,
-            ),
-//        colors = CardDefaults.cardColors(
-//            containerColor = Color.Transparent,
-//        ),
+                start = WeatherAppTheme.dimens.medium,
+                top = WeatherAppTheme.dimens.small,
+                end = WeatherAppTheme.dimens.medium,
+            )
     ) {
         TextField(
             modifier = Modifier
                 .fillMaxWidth(),
-            value = weatherViewState.searchInput,
+            value = searchInput,
             onValueChange = onSearchInputChanged,
-            isError = weatherViewState.searchError,
+            isError = searchError,
             label = {
-                if (!weatherViewState.searchError) {
+                if (!searchError) {
                     Text(
                         text = stringResource(R.string.title_search),
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        color = MaterialTheme.colorScheme.onSurface
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 } else {
-                    weatherViewState.errorMessageId?.let {
+                    errorMessageResId?.let {
                         Text(
                             text = stringResource(it),
-//                            style = MaterialTheme.typography.bodyMedium,
-//                            color = MaterialTheme.colorScheme.onSurface
+                            style = MaterialTheme.typography.bodySmall,
                         )
                     }
                 }
             },
             leadingIcon = {
-                if (!weatherViewState.searchError) {
+                if (!searchError) {
                     Icon(
                         modifier = Modifier.size(40.dp),
-//                        tint = MaterialTheme.colorScheme.onSurface,
                         painter = painterResource(R.drawable.ic_search),
                         contentDescription = stringResource(R.string.image_content_description_search),
                     )
@@ -89,23 +85,17 @@ internal fun WeatherSearch(
                         contentDescription = stringResource(R.string.image_content_description_search_error),
                     )
                 }
-
             },
             trailingIcon = {
                 IconButton(onClick = onLocationClick) {
                     Icon(
                         modifier = Modifier.size(40.dp),
-//                        tint = MaterialTheme.colorScheme.onSurface,
                         painter = painterResource(R.drawable.ic_my_location),
                         contentDescription = "weather icon",
                     )
                 }
             },
             colors = TextFieldDefaults.colors(
-//                focusedContainerColor = MaterialTheme.colorScheme.surface,
-//                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-//                cursorColor = MaterialTheme.colorScheme.onSurface,
-//                errorContainerColor = MaterialTheme.colorScheme.error,
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 errorIndicatorColor = Color.Transparent,
@@ -130,36 +120,21 @@ internal fun WeatherSearch(
 @Composable
 internal fun WeatherSearchPreview() {
     WeatherForecastComposeTheme {
-        Box(
-//            modifier = Modifier.paint(
-//                painterResource(id = R.drawable.sky_wallpaper),
-//                contentScale = ContentScale.FillBounds
-//            )
-        ) {
+        Box {
             Column {
                 WeatherSearch(
-                    weatherViewState = WeatherViewState(
-                        searchInput = "Moscow",
-                        isLoading = false,
-                        isRefreshing = false,
-                        searchError = false,
-                        errorMessageId = null,
-                        weatherUiState = null
-                    ),
+                    searchInput = "Moscow",
+                    searchError = false,
+                    errorMessageResId = null,
                     onSearchInputChanged = {},
                     onSearchDoneClick = {},
                     onLocationClick = {}
                 )
 
                 WeatherSearch(
-                    weatherViewState = WeatherViewState(
-                        searchInput = "AAAAAAAA",
-                        isRefreshing = true,
-                        isLoading = false,
-                        searchError = true,
-                        errorMessageId = R.string.error_wrong_city,
-                        weatherUiState = null
-                    ),
+                    searchInput = "AAAAAAAAAAA",
+                    searchError = true,
+                    errorMessageResId = R.string.error_wrong_city,
                     onSearchInputChanged = {},
                     onSearchDoneClick = {},
                     onLocationClick = {}

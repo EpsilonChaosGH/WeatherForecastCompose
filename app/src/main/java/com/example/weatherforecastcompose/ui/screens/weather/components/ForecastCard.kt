@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,9 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.designsystem.WeatherAppTheme
+import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 import com.example.weatherforecastcompose.model.Forecast
 import com.example.weatherforecastcompose.model.WeatherType
-import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
 
 @Composable
 internal fun ForecastCard(forecastList: List<Forecast>) {
@@ -75,22 +76,24 @@ internal fun ForecastItemCard(
         )
         Text(
             text = date,
-            modifier = Modifier.align(Alignment.CenterVertically)
+            style = MaterialTheme.typography.bodyLarge
         )
-        Row(
-            modifier = Modifier.align(Alignment.CenterVertically)
-        ) {
-            Text(text = humidity)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = humidity,
+                style = MaterialTheme.typography.bodyLarge,
+            )
             Icon(
                 modifier = Modifier.size(WeatherAppTheme.dimens.large),
                 painter = painterResource(R.drawable.ic_weather_humidity),
                 contentDescription = stringResource(R.string.image_content_description_humidity),
             )
         }
-        Row(
-            modifier = Modifier.align(Alignment.CenterVertically)
-        ) {
-            Text(text = temperature)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = temperature,
+                style = MaterialTheme.typography.bodyLarge
+            )
             Icon(
                 modifier = Modifier.size(WeatherAppTheme.dimens.large),
                 painter = painterResource(R.drawable.ic_weather_thermometer),
@@ -109,19 +112,19 @@ internal fun ForecastCardPreview() {
                 listOf(
                     Forecast(
                         temperature = "22",
-                        data = "15.06.2024",
+                        data = "Tue, 9 July 05:00",
                         humidity = "44",
                         weatherType = WeatherType.IC_02D
                     ),
                     Forecast(
                         temperature = "15",
-                        data = "15.06.2024",
+                        data = "Tue, 9 July 08:00",
                         humidity = "33",
                         weatherType = WeatherType.IC_01N
                     ),
                     Forecast(
                         temperature = "-4",
-                        data = "15.06.2024",
+                        data = "Tue, 9 July 11:00",
                         humidity = "77",
                         weatherType = WeatherType.IC_01D
                     )

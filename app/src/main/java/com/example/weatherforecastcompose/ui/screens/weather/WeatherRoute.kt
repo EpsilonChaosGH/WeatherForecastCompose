@@ -14,7 +14,6 @@ import com.example.weatherforecastcompose.ui.screens.weather.components.WeatherS
 internal fun WeatherRoute(
     onLocationClick: () -> Unit,
     modifier: Modifier,
-    navController: NavController,
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
 
@@ -23,7 +22,9 @@ internal fun WeatherRoute(
     Column(modifier = modifier) {
 
         WeatherSearch(
-            weatherViewState = uiState,
+            searchInput = uiState.searchInput,
+            searchError = uiState.searchError,
+            errorMessageResId = uiState.errorMessageResId,
             onSearchInputChanged = { searchInputValue ->
                 viewModel.obtainIntent(WeatherScreenIntent.SearchInputChanged(searchInputValue))
             },

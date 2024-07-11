@@ -94,7 +94,6 @@ fun AppNavHost(
             composable(TopLevelDestination.Weather.name) {
                 WeatherRoute(
                     onLocationClick = onLocationClick,
-                    navController = navController,
                     modifier = Modifier.padding(paddingValues)
                 )
             }
@@ -108,7 +107,6 @@ fun AppNavHost(
 
             composable(TopLevelDestination.Settings.name) {
                 SettingsScreen(
-                    navController = navController,
                     modifier = Modifier.padding(paddingValues)
                 )
             }

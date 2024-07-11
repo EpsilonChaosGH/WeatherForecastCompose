@@ -4,10 +4,9 @@ import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
 
 
-sealed class SettingsScreenIntent {
+sealed interface SettingsScreenIntent {
 
-    data class ChangeLanguage(val selectedLanguage: SupportedLanguage) : SettingsScreenIntent()
+    data class ChangeLanguage(val selectedLanguage: SupportedLanguage) : SettingsScreenIntent
 
-    data class ChangeUnits(val selectedUnits: Units) : SettingsScreenIntent()
-
+    data class ChangeUnits(val selectedUnits: Units) : SettingsScreenIntent
 }

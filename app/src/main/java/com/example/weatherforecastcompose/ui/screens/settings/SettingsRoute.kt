@@ -10,7 +10,6 @@ import androidx.navigation.NavController
 @Composable
 fun SettingsScreen(
     modifier: Modifier,
-    navController: NavController,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.settingUiState.collectAsStateWithLifecycle()

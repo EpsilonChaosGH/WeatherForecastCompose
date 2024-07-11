@@ -56,7 +56,7 @@ class WeatherViewModel @Inject constructor(
                 isLoading = true,
                 isRefreshing = false,
                 searchError = false,
-                errorMessageId = null,
+                errorMessageResId = null,
                 weatherUiState = null
             )
         )
@@ -119,7 +119,7 @@ class WeatherViewModel @Inject constructor(
                             it.copy(
                                 isLoading = false,
                                 searchError = result.errorType == ErrorType.WRONG_CITY,
-                                errorMessageId = result.errorType.toResourceId(),
+                                errorMessageResId = result.errorType.toResourceId(),
                             )
                         }
                     }
@@ -128,7 +128,7 @@ class WeatherViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         searchError = true,
-                        errorMessageId = R.string.error_empty_city
+                        errorMessageResId = R.string.error_empty_city
                     )
                 }
             }
@@ -163,7 +163,7 @@ class WeatherViewModel @Inject constructor(
                             isLoading = false,
                             isRefreshing = false,
                             searchError = false,
-                            errorMessageId = null,
+                            errorMessageResId = null,
                             weatherUiState = WeatherUiState(
                                 weather = weatherData,
                                 isFavorite = favorites.checkForFavorite(weatherData.currentWeather.id)
@@ -179,7 +179,7 @@ class WeatherViewModel @Inject constructor(
                             isLoading = false,
                             isRefreshing = false,
                             searchError = result.errorType == ErrorType.WRONG_CITY,
-                            errorMessageId = result.errorType.toResourceId(),
+                            errorMessageResId = result.errorType.toResourceId(),
                         )
                     }
                 }
@@ -190,10 +190,10 @@ class WeatherViewModel @Inject constructor(
 
 data class WeatherViewState(
     val searchInput: String,
+    val searchError: Boolean,
     val isLoading: Boolean,
     val isRefreshing: Boolean,
-    val searchError: Boolean,
-    val errorMessageId: Int?,
+    val errorMessageResId: Int?,
     val weatherUiState: WeatherUiState?
 )
 
@@ -201,3 +201,12 @@ data class WeatherUiState(
     val weather: Weather,
     val isFavorite: Boolean
 )
+
+sealed class SearchState {
+
+    val inputValue: String = ""
+
+    data object Success : SearchState()
+
+    data class Error(val errorMessageResId: Int) : SearchState()
+}
