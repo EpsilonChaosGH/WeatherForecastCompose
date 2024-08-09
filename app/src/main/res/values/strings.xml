@@ -30,6 +30,7 @@
 
     <string name="title_language">Language:</string>
     <string name="title_units">Units:</string>
+    <string name="title_dark_mode">Dark mode:</string>
 
     <string name="bt_save">Save</string>
 

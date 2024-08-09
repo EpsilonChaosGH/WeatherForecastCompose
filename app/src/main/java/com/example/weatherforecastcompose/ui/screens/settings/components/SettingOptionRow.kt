@@ -9,36 +9,38 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
-import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.components.AppBackground
+import com.example.weatherforecastcompose.designsystem.components.ThemePreviews
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 
 @Composable
 fun SettingOptionRow(
-    modifier: Modifier = Modifier,
     optionLabel: String,
     optionValue: String,
-    @DrawableRes optionIconValue: Int,
     @DrawableRes optionIcon: Int,
-    onOptionClicked: () -> Unit
+    @DrawableRes optionIconValue: Int,
+    onOptionClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onOptionClicked() }
-            .padding(6.dp)
+            .padding(AppTheme.dimens.extraSmall)
     ) {
         Icon(
             painter = painterResource(id = optionIcon),
             contentDescription = optionLabel,
-            modifier = Modifier.padding(6.dp)
+            modifier = Modifier
+                .padding(AppTheme.dimens.extraSmall)
                 .size(44.dp)
                 .align(Alignment.CenterVertically)
         )
@@ -46,34 +48,37 @@ fun SettingOptionRow(
             text = optionLabel,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .padding(6.dp),
-            fontWeight = FontWeight.Bold
+                .padding(AppTheme.dimens.extraSmall),
+            style = MaterialTheme.typography.titleLarge
         )
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(AppTheme.weight.FULL))
         Text(
             text = optionValue,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .padding(6.dp)
+                .padding(AppTheme.dimens.extraSmall),
+            style = MaterialTheme.typography.bodyLarge
         )
         Image(
             painter = painterResource(id = optionIconValue),
             contentDescription = optionLabel,
-            modifier = Modifier.padding(6.dp)
+            modifier = Modifier.padding(AppTheme.dimens.extraSmall)
         )
     }
 }
 
-@Preview(showBackground = true)
+@ThemePreviews
 @Composable
 fun SettingOptionRowPreview() {
-    WeatherForecastComposeTheme {
-        SettingOptionRow(
-            optionLabel = "Language",
-            optionValue = "Russian",
-            optionIcon = R.drawable.ic_language,
-            optionIconValue = R.drawable.flag_of_russia,
-            onOptionClicked = {}
-        )
+    AppTheme {
+        AppBackground {
+            SettingOptionRow(
+                optionLabel = "Language",
+                optionValue = "Russian",
+                optionIcon = R.drawable.ic_language,
+                optionIconValue = R.drawable.flag_of_russia,
+                onOptionClicked = {}
+            )
+        }
     }
 }

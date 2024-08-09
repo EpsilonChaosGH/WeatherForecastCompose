@@ -22,5 +22,4 @@ sealed interface WeatherScreenIntent {
     data class AddToFavorites(val value: FavoritesCoordinates) : WeatherScreenIntent
 
     data class RemoveFromFavorites(val value: FavoritesCoordinates) : WeatherScreenIntent
-
 }

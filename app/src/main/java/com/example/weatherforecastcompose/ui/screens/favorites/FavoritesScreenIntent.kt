@@ -16,5 +16,4 @@ sealed interface FavoritesScreenIntent {
     data class SetCoordinates(val value: Coordinates) : FavoritesScreenIntent
 
     data class RemoveFromFavorites(val value: FavoritesCoordinates) : FavoritesScreenIntent
-
 }

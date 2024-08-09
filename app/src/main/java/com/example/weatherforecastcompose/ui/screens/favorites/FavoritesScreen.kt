@@ -14,16 +14,51 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.FavoritesCoordinates
+import com.example.weatherforecastcompose.ui.navigation.TopLevelDestination
 import com.example.weatherforecastcompose.ui.screens.favorites.components.FavoriteItemCard
 import com.example.weatherforecastcompose.ui.screens.favorites.components.SwipeToDeleteContainer
 
+
+@Composable
+fun FavoritesRoute(
+    modifier: Modifier,
+    navController: NavController,
+    viewModel: FavoritesViewModel = hiltViewModel()
+) {
+
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+    FavoritesScreen(
+        favoritesViewState = uiState,
+        onItemClick = {
+            viewModel.obtainIntent(FavoritesScreenIntent.SetCoordinates(it))
+            navController.navigate(TopLevelDestination.Weather.name) {
+                popUpTo(0) { inclusive = true }
+            }
+        },
+        onFavoriteIconClick = { favoritesCoordinates, isFavorite ->
+            if (isFavorite) viewModel.obtainIntent(
+                FavoritesScreenIntent.RemoveFromFavorites(
+                    favoritesCoordinates
+                )
+            )
+            else viewModel.obtainIntent(FavoritesScreenIntent.AddToFavorites(favoritesCoordinates))
+        },
+        onRefresh = { viewModel.obtainIntent(FavoritesScreenIntent.RefreshScreenState) },
+        modifier = modifier
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

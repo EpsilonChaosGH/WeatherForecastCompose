@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -33,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherforecastcompose.R
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,7 +63,7 @@ fun SingleSelectBottomSheet(
         ) {
             Text(
                 text = title,
-                fontSize = 30.sp,
+                style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(
                     vertical = 16.dp,
                     horizontal = 16.dp
@@ -71,14 +71,14 @@ fun SingleSelectBottomSheet(
             )
 
             val selectedItemsState = remember { mutableStateOf(selectedItem) }
-            LazyColumn(Modifier.weight(1f, false)) {
+            LazyColumn(Modifier.weight(AppTheme.weight.FULL, false)) {
                 items(items) { item ->
                     Row(Modifier.clickable {
                         selectedItemsState.value = item.copy(isSelected = true)
                     }) {
                         RadioButton(
                             modifier = Modifier
-                                .padding(16.dp)
+                                .padding(AppTheme.dimens.medium)
                                 .align(alignment = Alignment.CenterVertically),
                             selected = selectedItemsState.value.id == item.id,
                             onClick = null
@@ -86,13 +86,13 @@ fun SingleSelectBottomSheet(
                         Text(
                             text = item.name,
                             modifier = Modifier
-                                .padding(6.dp)
+                                .padding(AppTheme.dimens.small)
                                 .align(alignment = Alignment.CenterVertically)
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Image(
                             modifier = Modifier
-                                .padding(6.dp)
+                                .padding(AppTheme.dimens.small)
                                 .align(alignment = Alignment.CenterVertically),
                             painter = painterResource(id = item.imageResId),
                             contentDescription = item.name
@@ -103,7 +103,7 @@ fun SingleSelectBottomSheet(
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(AppTheme.dimens.medium)
                     .background(
                         color = MaterialTheme.colorScheme.primaryContainer,
                         shape = MaterialTheme.shapes.small,
@@ -119,17 +119,18 @@ fun SingleSelectBottomSheet(
                     onSaveState(selectedItemsState.value)
                 }
             ) {
-                Text(text = stringResource(R.string.bt_save), fontSize = 22.sp)
+                Text(
+                    text = stringResource(R.string.bt_save),
+                    style = MaterialTheme.typography.headlineLarge
+                )
             }
         }
     }
 }
 
 data class BottomSheetItem(
-    val name: String,
     val id: Int,
+    val name: String,
     @DrawableRes val imageResId: Int,
     val isSelected: Boolean = false,
 )
-
-const val NONE_ID = -1

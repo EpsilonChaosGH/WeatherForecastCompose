@@ -5,7 +5,6 @@ import com.example.weatherforecastcompose.model.Air
 import com.example.weatherforecastcompose.model.AirQuality
 import kotlin.math.roundToInt
 
-
 fun AirResponse.toAir(): Air {
 
     val no2 = list.firstOrNull()?.components?.get("no2") ?: -1.0

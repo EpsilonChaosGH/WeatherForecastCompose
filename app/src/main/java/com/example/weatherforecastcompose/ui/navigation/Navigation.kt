@@ -5,11 +5,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -19,9 +22,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.ui.screens.favorites.FavoritesRoute
-import com.example.weatherforecastcompose.ui.screens.settings.SettingsScreen
+import com.example.weatherforecastcompose.ui.screens.settings.SettingsRoute
 import com.example.weatherforecastcompose.ui.screens.weather.WeatherRoute
 
 @Composable
@@ -33,7 +35,7 @@ fun AppNavHost(
         bottomBar = {
             BottomAppBar(
 //                containerColor = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.height(100.dp)
+                modifier = Modifier.height(80.dp)
             ) {
                 val backStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = backStackEntry?.destination?.route
@@ -66,13 +68,13 @@ fun AppNavHost(
 //                            )
 //                        },
 //                        alwaysShowLabel = false,
-//                        colors = NavigationBarItemDefaults.colors(
-//                            indicatorColor = Color.Transparent,
-//                            selectedIconColor = MaterialTheme.colorScheme.onSurface,
-//                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent,
+                            selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                            unselectedIconColor = MaterialTheme.colorScheme.surfaceContainerLowest,
 //                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
 //                            unselectedTextColor = MaterialTheme.colorScheme.onSurface,
-//                        )
+                        )
                     )
                 }
             }
@@ -106,7 +108,7 @@ fun AppNavHost(
             }
 
             composable(TopLevelDestination.Settings.name) {
-                SettingsScreen(
+                SettingsRoute(
                     modifier = Modifier.padding(paddingValues)
                 )
             }

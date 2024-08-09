@@ -1,65 +1,97 @@
 package com.example.weatherforecastcompose.designsystem.components
 
-import android.Manifest
-import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.example.weatherforecastcompose.R
+import androidx.compose.ui.text.style.TextAlign
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PermissionRationaleDialog(
-    isDialogShown: MutableState<Boolean>,
-    activityPermissionResult: ActivityResultLauncher<String>,
-    showWeatherUI: MutableState<Boolean>
+fun PermissionDialog(
+    permissionTextProvider: PermissionTextProvider,
+    isPermanentlyDeclined: Boolean,
+    onDismiss: () -> Unit,
+    onOkClick: () -> Unit,
+    onGoToAppSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    BasicAlertDialog(
-        onDismissRequest = { isDialogShown.value = false },
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-    ) {
-        Column {
-            LargeLabel(
-                text = stringResource(R.string.location_rationale_title),
-                modifier = Modifier.padding(
-                    horizontal = 16.dp,//WeatherAppTheme.dimens.medium,
-                    vertical = 8.dp,// WeatherAppTheme.dimens.small
-                )
-            )
-
-            MediumBody(
-                text = stringResource(R.string.location_rationale_description),
-                modifier = Modifier.padding(16.dp)
-            )
-
-            Row(modifier = Modifier.padding(16.dp)) {
-                PositiveButton(
-                    text = stringResource(R.string.location_rationale_button_grant),
-                    onClick = {
-                        isDialogShown.value = false
-                        activityPermissionResult.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-                    }
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                NegativeButton(
-                    text = stringResource(R.string.location_rationale_button_deny),
-                    onClick = {
-                        isDialogShown.value = false
-                        showWeatherUI.value = false
-                    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                HorizontalDivider()
+                Text(
+                    text = if (isPermanentlyDeclined) {
+                        "Grant permission"
+                    } else {
+                        "OK"
+                    },
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            if (isPermanentlyDeclined) {
+                                onGoToAppSettingsClick()
+                            } else {
+                                onOkClick()
+                            }
+                        }
+                        .padding(AppTheme.dimens.medium)
                 )
             }
+        },
+        title = {
+            Text(text = "Permission required", style = MaterialTheme.typography.titleLarge)
+        },
+        text = {
+            Text(
+                text = permissionTextProvider.getDescription(
+                    isPermanentlyDeclined = isPermanentlyDeclined
+                )
+            )
+        },
+        modifier = modifier
+    )
+}
+
+interface PermissionTextProvider {
+    fun getDescription(isPermanentlyDeclined: Boolean): String
+}
+
+class CoarseLocationPermissionTextProvider : PermissionTextProvider {
+    override fun getDescription(isPermanentlyDeclined: Boolean): String {
+        return if (isPermanentlyDeclined) {
+            "It seems you permanently declined location permission. " +
+                    "You can go to the app settings to grant it."
+        } else {
+            "This app needs access to your location to show " +
+                    "the weather in your location"
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+internal fun PermissionDialogPreview() {
+    AppTheme {
+        AppBackground {
+            PermissionDialog(
+                permissionTextProvider = CoarseLocationPermissionTextProvider(),
+                isPermanentlyDeclined = true,
+                onDismiss = {},
+                onOkClick = {},
+                onGoToAppSettingsClick = {}
+            )
         }
     }
 }

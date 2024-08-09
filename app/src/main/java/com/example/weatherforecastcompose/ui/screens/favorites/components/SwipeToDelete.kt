@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,7 +92,7 @@ fun DeleteBackground(
         modifier = Modifier
             .fillMaxSize()
             .background(color)
-            .padding(16.dp),
+            .padding(AppTheme.dimens.medium),
         contentAlignment = Alignment.CenterEnd
     ) {
         Icon(

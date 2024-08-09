@@ -11,7 +11,6 @@ import retrofit2.Response
 import java.io.IOException
 import java.net.HttpURLConnection
 
-
 fun <T, R> Response<T>.responseToDate(mapper: T.() -> R): R {
     try {
         return if (this.isSuccessful && this.body() != null) {

@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.example.weatherforecastcompose.R
 
-
 data class Air(
     val no2: String,
     val no2Quality: AirQuality,

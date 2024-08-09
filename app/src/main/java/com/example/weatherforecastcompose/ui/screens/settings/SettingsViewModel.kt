@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherforecastcompose.data.SettingsRepository
+import com.example.weatherforecastcompose.model.DarkThemeConfig
 import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
 import com.example.weatherforecastcompose.ui.screens.IntentHandler
@@ -23,11 +24,13 @@ class SettingsViewModel @Inject constructor(
     val settingUiState: StateFlow<SettingsScreenViewState> = combine(
         settingsRepository.getLanguage(),
         settingsRepository.getUnits(),
-    ) { language, units ->
-        Log.e("aaa_settingsFlowSETTINGS", language.toString() + " _____ " + units.toString())
+        settingsRepository.getDarkThemConfig()
+    ) { language, units , config->
+        Log.e("aaa_settingsFlowSETTINGS", "$language _____ $units")
         SettingsScreenViewState(
             selectedLanguage = language,
-            selectedUnit = units
+            selectedUnit = units,
+            selectedDarkThemConfig = config
         )
     }.stateIn(
         scope = viewModelScope,
@@ -35,42 +38,35 @@ class SettingsViewModel @Inject constructor(
         initialValue = SettingsScreenViewState(),
     )
 
-//    init {
-//        viewModelScope.launch {
-//            settingsRepository.getLanguage().collect {
-//                Log.e("aaaGL", it.languageValue)
-//
-//            }
-//        }
-//        viewModelScope.launch {
-//            settingsRepository.getUnits().collect {
-//                Log.e("aaaGU", it.tempLabel)
-//            }
-//        }
-//    }
-
-
-override fun obtainIntent(intent: SettingsScreenIntent) {
-    when (intent) {
-        is SettingsScreenIntent.ChangeLanguage -> {
-            viewModelScope.launch {
-                settingsRepository.setLanguage(intent.selectedLanguage)
+    override fun obtainIntent(intent: SettingsScreenIntent) {
+        when (intent) {
+            is SettingsScreenIntent.ChangeLanguage -> {
+                viewModelScope.launch {
+                    settingsRepository.setLanguage(intent.selectedLanguage)
+                }
             }
-        }
 
-        is SettingsScreenIntent.ChangeUnits -> {
-            viewModelScope.launch {
-                settingsRepository.setUnits(intent.selectedUnits)
+            is SettingsScreenIntent.ChangeUnits -> {
+                viewModelScope.launch {
+                    settingsRepository.setUnits(intent.selectedUnits)
+                }
+            }
+
+            is SettingsScreenIntent.ChangeDarkThemConfig -> {
+                viewModelScope.launch {
+                    settingsRepository.setDarkThemConfig(intent.selectedConfig)
+                }
             }
         }
     }
 }
-}
 
 data class SettingsScreenViewState(
-    val selectedUnit: Units = Units.METRIC,
     val selectedLanguage: SupportedLanguage = SupportedLanguage.ENGLISH,
-    val availableUnits: List<Units> = Units.entries,
     val availableLanguages: List<SupportedLanguage> = SupportedLanguage.entries,
+    val selectedUnit: Units = Units.METRIC,
+    val availableUnits: List<Units> = Units.entries,
+    val selectedDarkThemConfig: DarkThemeConfig = DarkThemeConfig.FOLLOW_SYSTEM,
+    val availableDarkThemConfig: List<DarkThemeConfig> = DarkThemeConfig.entries ,
     val error: Throwable? = null
 )

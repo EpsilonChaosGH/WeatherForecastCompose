@@ -1,4 +1,4 @@
-package com.example.weatherforecastcompose.designsystem
+package com.example.weatherforecastcompose.designsystem.theme
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.dp

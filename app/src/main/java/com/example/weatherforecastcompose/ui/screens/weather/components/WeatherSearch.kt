@@ -1,6 +1,5 @@
 package com.example.weatherforecastcompose.ui.screens.weather.components
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,11 +21,11 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
-import com.example.weatherforecastcompose.designsystem.WeatherAppTheme
-import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.components.AppBackground
+import com.example.weatherforecastcompose.designsystem.components.ThemePreviews
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 
 @Composable
 internal fun WeatherSearch(
@@ -44,9 +43,9 @@ internal fun WeatherSearch(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                start = WeatherAppTheme.dimens.medium,
-                top = WeatherAppTheme.dimens.small,
-                end = WeatherAppTheme.dimens.medium,
+                start = AppTheme.dimens.medium,
+                top = AppTheme.dimens.small,
+                end = AppTheme.dimens.medium,
             )
     ) {
         TextField(
@@ -59,13 +58,13 @@ internal fun WeatherSearch(
                 if (!searchError) {
                     Text(
                         text = stringResource(R.string.title_search),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 } else {
                     errorMessageResId?.let {
                         Text(
                             text = stringResource(it),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
@@ -116,11 +115,11 @@ internal fun WeatherSearch(
     }
 }
 
-@Preview(showBackground = true)
+@ThemePreviews
 @Composable
 internal fun WeatherSearchPreview() {
-    WeatherForecastComposeTheme {
-        Box {
+    AppTheme {
+        AppBackground {
             Column {
                 WeatherSearch(
                     searchInput = "Moscow",

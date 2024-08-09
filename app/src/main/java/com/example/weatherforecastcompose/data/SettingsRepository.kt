@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.weatherforecastcompose.model.Coordinates
+import com.example.weatherforecastcompose.model.DarkThemeConfig
 import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,7 +24,7 @@ class SettingsRepository @Inject constructor(
     private val prefLanguage by lazy { stringPreferencesKey(KEY_LANGUAGE) }
     private val prefUnits by lazy { stringPreferencesKey(KEY_UNITS) }
     private val prefCoordinates by lazy { stringPreferencesKey(KEY_COORDINATES) }
-
+    private val prefDarkThemeConfig by lazy { stringPreferencesKey(KEY_COORDINATES) }
 
     suspend fun setLanguage(language: SupportedLanguage) {
         context.dataStoreLanguage.edit { it[prefLanguage] = language.name }
@@ -58,6 +59,16 @@ class SettingsRepository @Inject constructor(
         }
     }
 
+    suspend fun setDarkThemConfig(config: DarkThemeConfig) {
+        context.dataStoreDarkThemConfig.edit { it[prefDarkThemeConfig] = config.name }
+    }
+
+    fun getDarkThemConfig(): Flow<DarkThemeConfig> {
+        return context.dataStoreDarkThemConfig.data.map {
+            DarkThemeConfig.valueOf(it[prefDarkThemeConfig] ?: DarkThemeConfig.FOLLOW_SYSTEM.name)
+        }
+    }
+
     companion object {
         // Tokyo coordinates
         const val DEFAULT_LON = "139.6917"
@@ -66,9 +77,11 @@ class SettingsRepository @Inject constructor(
         const val KEY_LANGUAGE = "language"
         const val KEY_UNITS = "units"
         const val KEY_COORDINATES = "coordinates"
+        const val KEY_DARK_THEM_CONFIG = "coordinates"
     }
 }
 
 val Context.dataStoreLanguage: DataStore<Preferences> by preferencesDataStore(name = "language")
 val Context.dataStoreUnits: DataStore<Preferences> by preferencesDataStore(name = "units")
 val Context.dataStoreCoordinates: DataStore<Preferences> by preferencesDataStore(name = "coordinates")
+val Context.dataStoreDarkThemConfig: DataStore<Preferences> by preferencesDataStore(name = "darkThemConfig")

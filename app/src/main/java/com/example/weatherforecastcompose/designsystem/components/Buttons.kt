@@ -1,17 +1,21 @@
 package com.example.weatherforecastcompose.designsystem.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 
 @Composable
 fun PositiveButton(
     text: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Button(
         modifier = modifier.background(
@@ -26,15 +30,15 @@ fun PositiveButton(
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
     ) {
-        LargeLabel(text = text)
+        Text(text = text)
     }
 }
 
 @Composable
 fun NegativeButton(
     text: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Button(
         modifier = modifier.background(
@@ -49,6 +53,19 @@ fun NegativeButton(
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer
         )
     ) {
-        LargeLabel(text = text)
+        Text(text = text)
+    }
+}
+
+
+@ThemePreviews
+@Composable
+internal fun PositiveButtonPreview() {
+    AppTheme {
+        AppBackground(modifier = Modifier
+            .fillMaxWidth()
+            .padding()) {
+            PositiveButton(text = "Test button", onClick = {})
+        }
     }
 }

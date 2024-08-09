@@ -1,6 +1,5 @@
 package com.example.weatherforecastcompose.ui.screens.weather.components
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -21,11 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
-import com.example.weatherforecastcompose.designsystem.WeatherAppTheme
-import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.components.AppBackground
+import com.example.weatherforecastcompose.designsystem.components.ThemePreviews
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
 import com.example.weatherforecastcompose.model.FavoritesCoordinates
@@ -41,19 +40,19 @@ internal fun WeatherCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                start = WeatherAppTheme.dimens.medium,
-                top = WeatherAppTheme.dimens.small,
-                end = WeatherAppTheme.dimens.medium,
+                start = AppTheme.dimens.medium,
+                top = AppTheme.dimens.small,
+                end = AppTheme.dimens.medium,
             )
     ) {
         Row(
             Modifier
-                .padding(WeatherAppTheme.dimens.small)
+                .padding(AppTheme.dimens.small)
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
         ) {
             Column(
-                modifier = Modifier.weight(WeatherAppTheme.weight.FULL),
+                modifier = Modifier.weight(AppTheme.weight.FULL),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -61,14 +60,14 @@ internal fun WeatherCard(
                         painter = painterResource(id = R.drawable.ic_location),
                         contentDescription = stringResource(id = R.string.image_content_description_city)
                     )
-                    Spacer(modifier = Modifier.width(WeatherAppTheme.dimens.extraSmall))
+                    Spacer(modifier = Modifier.width(AppTheme.dimens.extraSmall))
                     Text(
                         text = currentWeather.city,
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineMedium
                     )
                 }
                 Row(
-                    modifier = Modifier.padding(top = WeatherAppTheme.dimens.extraSmall),
+                    modifier = Modifier.padding(top = AppTheme.dimens.extraSmall),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -76,19 +75,19 @@ internal fun WeatherCard(
                         painter = painterResource(id = R.drawable.ic_calendar),
                         contentDescription = stringResource(id = R.string.image_content_description_date)
                     )
-                    Spacer(modifier = Modifier.width(WeatherAppTheme.dimens.extraSmall))
+                    Spacer(modifier = Modifier.width(AppTheme.dimens.extraSmall))
                     Text(
                         text = currentWeather.data,
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
-                Row(Modifier.padding(top = WeatherAppTheme.dimens.small)) {
+                Row(Modifier.padding(top = AppTheme.dimens.small)) {
                     Text(
                         text = currentWeather.description,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
-                Spacer(modifier = Modifier.weight(WeatherAppTheme.weight.FULL))
+                Spacer(modifier = Modifier.weight(AppTheme.weight.FULL))
                 Text(
                     text = currentWeather.temperature,
                     style = MaterialTheme.typography.displayLarge
@@ -128,11 +127,11 @@ internal fun WeatherCard(
     }
 }
 
-@Preview(showBackground = true)
+@ThemePreviews
 @Composable
 internal fun WeatherCardPreview() {
-    WeatherForecastComposeTheme {
-        Box {
+    AppTheme {
+        AppBackground(modifier = Modifier.fillMaxWidth()) {
             WeatherCard(
                 currentWeather = CurrentWeather(
                     id = 0,

@@ -13,15 +13,28 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.weatherforecastcompose.MainActivityUiState.*
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.designsystem.components.CoarseLocationPermissionTextProvider
 import com.example.weatherforecastcompose.designsystem.components.PermissionDialog
 import com.example.weatherforecastcompose.ui.navigation.AppNavHost
-import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
+import com.example.weatherforecastcompose.model.DarkThemeConfig
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,10 +59,22 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        var uiState: MainActivityUiState by mutableStateOf(Loading)
+
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState
+                    .onEach { uiState = it }
+                    .collect()
+            }
+        }
+
         enableEdgeToEdge()
 
         setContent {
-            WeatherForecastComposeTheme {
+            val darkTheme = shouldUseDarkTheme(uiState)
+
+            AppTheme(darkTheme = darkTheme) {
 
                 val viewModel = viewModel<MainViewModel>()
 
@@ -108,4 +133,16 @@ fun Activity.openAppSettings() {
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
         Uri.fromParts("package", packageName, null)
     ).also(::startActivity)
+}
+
+@Composable
+private fun shouldUseDarkTheme(
+    uiState: MainActivityUiState,
+): Boolean = when (uiState) {
+    Loading -> isSystemInDarkTheme()
+    is Success -> when (uiState.data) {
+        DarkThemeConfig.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+        DarkThemeConfig.LIGHT -> false
+        DarkThemeConfig.DARK -> true
+    }
 }

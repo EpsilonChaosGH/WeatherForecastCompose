@@ -17,11 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
-import com.example.weatherforecastcompose.designsystem.WeatherAppTheme
-import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.components.AppBackground
+import com.example.weatherforecastcompose.designsystem.components.ThemePreviews
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 
 @Composable
 internal fun SmallCard(
@@ -33,21 +33,21 @@ internal fun SmallCard(
 ) {
     Card(modifier = modifier) {
         Row(
-            modifier = Modifier.padding(WeatherAppTheme.dimens.small),
+            modifier = Modifier.padding(AppTheme.dimens.small),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(WeatherAppTheme.weight.FULL)) {
+            Column(modifier = Modifier.weight(AppTheme.weight.FULL)) {
                 Text(
                     text = stringResource(id = titleResId),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
                     text = value,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
             Icon(
-                modifier = Modifier.size(WeatherAppTheme.dimens.ultraLarge),
+                modifier = Modifier.size(AppTheme.dimens.ultraLarge),
                 tint = iconColor,
                 painter = painterResource(iconResId),
                 contentDescription = stringResource(id = titleResId),
@@ -56,11 +56,11 @@ internal fun SmallCard(
     }
 }
 
-@Preview(showBackground = true)
+@ThemePreviews
 @Composable
 internal fun SmallCardPreview() {
-    WeatherForecastComposeTheme {
-        Column {
+    AppTheme {
+        AppBackground {
             SmallCard(
                 value = "122 μg/m3",
                 titleResId = R.string.title_pm10,

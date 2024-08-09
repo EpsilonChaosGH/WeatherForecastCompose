@@ -19,8 +19,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherforecastcompose.R
-import com.example.weatherforecastcompose.designsystem.WeatherAppTheme
-import com.example.weatherforecastcompose.designsystem.WeatherForecastComposeTheme
+import com.example.weatherforecastcompose.designsystem.components.AppBackground
+import com.example.weatherforecastcompose.designsystem.components.ThemePreviews
+import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 import com.example.weatherforecastcompose.model.Forecast
 import com.example.weatherforecastcompose.model.WeatherType
 
@@ -30,10 +31,10 @@ internal fun ForecastCard(forecastList: List<Forecast>) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                start = WeatherAppTheme.dimens.medium,
-                top = WeatherAppTheme.dimens.small,
-                end = WeatherAppTheme.dimens.medium,
-                bottom = WeatherAppTheme.dimens.small
+                start = AppTheme.dimens.medium,
+                top = AppTheme.dimens.small,
+                end = AppTheme.dimens.medium,
+                bottom = AppTheme.dimens.small
             )
     ) {
         forecastList.forEachIndexed { index, item ->
@@ -46,7 +47,7 @@ internal fun ForecastCard(forecastList: List<Forecast>) {
             )
             if (forecastList.size != index + 1) {
                 HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = WeatherAppTheme.dimens.medium),
+                    modifier = Modifier.padding(horizontal = AppTheme.dimens.medium),
                     thickness = 1.dp
                 )
             }
@@ -64,7 +65,7 @@ internal fun ForecastItemCard(
 ) {
     Row(
         modifier = Modifier
-            .padding(WeatherAppTheme.dimens.small)
+            .padding(AppTheme.dimens.small)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -76,15 +77,15 @@ internal fun ForecastItemCard(
         )
         Text(
             text = date,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.titleMedium
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = humidity,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
             )
             Icon(
-                modifier = Modifier.size(WeatherAppTheme.dimens.large),
+                modifier = Modifier.size(AppTheme.dimens.large),
                 painter = painterResource(R.drawable.ic_weather_humidity),
                 contentDescription = stringResource(R.string.image_content_description_humidity),
             )
@@ -92,10 +93,10 @@ internal fun ForecastItemCard(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = temperature,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.titleMedium
             )
             Icon(
-                modifier = Modifier.size(WeatherAppTheme.dimens.large),
+                modifier = Modifier.size(AppTheme.dimens.large),
                 painter = painterResource(R.drawable.ic_weather_thermometer),
                 contentDescription = stringResource(R.string.image_content_description_temperature),
             )
@@ -103,11 +104,11 @@ internal fun ForecastItemCard(
     }
 }
 
-@Preview(showBackground = true)
+@ThemePreviews
 @Composable
 internal fun ForecastCardPreview() {
-    WeatherForecastComposeTheme {
-        Column {
+    AppTheme {
+        AppBackground(modifier = Modifier.fillMaxWidth()) {
             ForecastCard(
                 listOf(
                     Forecast(
