@@ -17,6 +17,7 @@
 
 
     <string name="title_search">Search</string>
+    <string name="title_loading">Loading</string>
 
     <string name="title_feels_like">Feels like</string>
     <string name="title_humidity">Humidity</string>

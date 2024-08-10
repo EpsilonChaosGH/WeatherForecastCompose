@@ -29,8 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 import kotlinx.coroutines.launch
@@ -39,18 +37,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun SingleSelectBottomSheet(
     title: String,
-    items: List<BottomSheetItem>,
-    selectedItem: BottomSheetItem,
     sheetState: SheetState,
+    selectedItem: BottomSheetItem,
+    items: List<BottomSheetItem>,
     onSaveState: (BottomSheetItem) -> Unit,
     onDismiss: (() -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
     ModalBottomSheet(
         onDismissRequest = {
-            scope.launch {
-                sheetState.hide()
-            }
+            scope.launch { sheetState.hide() }
             if (onDismiss != null) {
                 onDismiss()
             }
@@ -65,8 +61,8 @@ fun SingleSelectBottomSheet(
                 text = title,
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(
-                    vertical = 16.dp,
-                    horizontal = 16.dp
+                    vertical = AppTheme.dimens.medium,
+                    horizontal = AppTheme.dimens.medium
                 )
             )
 
@@ -113,9 +109,7 @@ fun SingleSelectBottomSheet(
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 onClick = {
-                    scope.launch {
-                        sheetState.hide()
-                    }
+                    scope.launch { sheetState.hide() }
                     onSaveState(selectedItemsState.value)
                 }
             ) {
