@@ -11,8 +11,6 @@ sealed interface FavoritesScreenIntent {
 
     data object RefreshScreenState : FavoritesScreenIntent
 
-    data class AddToFavorites(val value: FavoritesCoordinates) : FavoritesScreenIntent
-
     data class SetCoordinates(val value: Coordinates) : FavoritesScreenIntent
 
     data class RemoveFromFavorites(val value: FavoritesCoordinates) : FavoritesScreenIntent

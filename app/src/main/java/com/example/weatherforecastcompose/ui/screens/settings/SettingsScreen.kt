@@ -189,7 +189,7 @@ fun SettingsScreenLoadingPreview() {
 
 @DevicePreviews
 @Composable
-fun SettingsScreenDataPreview() {
+fun SettingsScreenSuccessPreview() {
     AppTheme {
         AppBackground {
             SettingsScreen(
