@@ -27,9 +27,9 @@ class FavoritesRepository @Inject constructor(
             favoritesDao.addToFavorites(favoritesCoordinates.toFavoritesDbEntity())
         }
 
-    suspend fun removeFromFavorites(favoritesCoordinates: FavoritesCoordinates) =
+    suspend fun removeFromFavorites(id: Long) =
         withContext(Dispatchers.IO) {
-            favoritesDao.deleteFromFavorites(favoritesCoordinates.id)
+            favoritesDao.deleteFromFavorites(id)
         }
 
     suspend fun checkForFavorite(id: Long): Boolean = withContext(Dispatchers.IO) {

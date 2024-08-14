@@ -1,14 +1,14 @@
 package com.example.weatherforecastcompose
 
-import android.service.autofill.UserData
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecastcompose.MainActivityUiState.*
+import com.example.weatherforecastcompose.MainActivityUiState.Loading
+import com.example.weatherforecastcompose.MainActivityUiState.Success
 import com.example.weatherforecastcompose.data.SettingsRepository
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.DarkThemeConfig
-import com.example.weatherforecastcompose.ui.screens.IntentHandler
+import com.example.weatherforecastcompose.ui.screens.ActionHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val settings: SettingsRepository
-) : ViewModel(), IntentHandler<MainIntent> {
+) : ViewModel(), ActionHandler<MainAction> {
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
 
@@ -32,15 +32,22 @@ class MainViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000),
     )
 
-    override fun obtainIntent(intent: MainIntent) {
-        when (intent) {
-            MainIntent.DismissPermissionDialog -> dismissDialog()
-            is MainIntent.PermissionResult -> onPermissionResult(
-                permission = intent.permission,
-                isGranted = intent.isGranted
+    override fun onAction(action: MainAction) {
+        when (val state = uiState.value) {
+            Loading -> Unit
+            is Success -> reduce(action = action, state = state)
+        }
+    }
+
+    private fun reduce(action: MainAction, state: Success) {
+        when (action) {
+            MainAction.DismissPermissionDialog -> dismissDialog()
+            is MainAction.PermissionResult -> onPermissionResult(
+                permission = action.permission,
+                isGranted = action.isGranted
             )
 
-            is MainIntent.ReceiveLocation -> setCoordinates(intent.coordinates)
+            is MainAction.ReceiveLocation -> setCoordinates(action.coordinates)
         }
     }
 
@@ -64,13 +71,13 @@ class MainViewModel @Inject constructor(
     }
 }
 
-sealed interface MainIntent {
+sealed interface MainAction {
 
-    data object DismissPermissionDialog : MainIntent
+    data object DismissPermissionDialog : MainAction
 
-    data class PermissionResult(val permission: String, val isGranted: Boolean) : MainIntent
+    data class PermissionResult(val permission: String, val isGranted: Boolean) : MainAction
 
-    data class ReceiveLocation(val coordinates: Coordinates) : MainIntent
+    data class ReceiveLocation(val coordinates: Coordinates) : MainAction
 }
 
 sealed interface MainActivityUiState {

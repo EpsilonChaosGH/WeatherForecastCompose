@@ -20,13 +20,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.weatherforecastcompose.designsystem.theme.AppTheme
+import com.example.weatherforecastcompose.model.Air
+import com.example.weatherforecastcompose.model.AirQuality
+import com.example.weatherforecastcompose.model.Coordinates
+import com.example.weatherforecastcompose.model.CurrentWeather
 import com.example.weatherforecastcompose.model.FavoritesCoordinates
+import com.example.weatherforecastcompose.model.Forecast
+import com.example.weatherforecastcompose.model.Weather
+import com.example.weatherforecastcompose.model.WeatherType
 import com.example.weatherforecastcompose.ui.screens.weather.components.AirCard
 import com.example.weatherforecastcompose.ui.screens.weather.components.ForecastCard
 import com.example.weatherforecastcompose.ui.screens.weather.components.SecondWeatherCard
@@ -44,23 +52,19 @@ internal fun WeatherRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     WeatherScreen(
-        weatherViewState = uiState,
-        searchInput = uiState.searchInput,
-        searchError = uiState.searchError,
-        errorMessageResId = uiState.errorMessageResId,
+        uiState = uiState,
+        onAction = { action ->
+            Log.e("aaaWW",action.toString())
+            when (action) {
+                is WeatherScreenAction.AddToFavorites -> viewModel.onAction(action)
+                WeatherScreenAction.PermissionsDenied -> viewModel.onAction(action)
+                WeatherScreenAction.RefreshScreenState -> viewModel.onAction(action)
+                is WeatherScreenAction.RemoveFromFavorites -> viewModel.onAction(action)
+                is WeatherScreenAction.SearchWeatherByCoordinates -> onLocationClick()
+                is WeatherScreenAction.SettingsChanged -> viewModel.onAction(action)
+            }
+        },
         modifier = modifier,
-        onSearchInputChanged = { searchInputValue ->
-            viewModel.obtainIntent(WeatherScreenIntent.SearchInputChanged(searchInputValue))
-        },
-        onSearchDoneClick = { viewModel.obtainIntent(WeatherScreenIntent.SearchWeatherByCity) },
-        onLocationClick = onLocationClick,
-        onFavoriteIconClick = { favoriteCoordinate, isFavorite ->
-            if (isFavorite) viewModel.obtainIntent(
-                WeatherScreenIntent.RemoveFromFavorites(favoriteCoordinate)
-            )
-            else viewModel.obtainIntent(WeatherScreenIntent.AddToFavorites(favoriteCoordinate))
-        },
-        onRefresh = { viewModel.obtainIntent(WeatherScreenIntent.RefreshScreenState) }
     )
 
 }
@@ -68,104 +72,118 @@ internal fun WeatherRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun WeatherScreen(
-    weatherViewState: WeatherViewState,
-    searchInput: String,
-    searchError: Boolean,
-    errorMessageResId: Int?,
+    uiState: WeatherUiState,
+    onAction: (WeatherScreenAction) -> Unit,
     modifier: Modifier = Modifier,
-    onSearchInputChanged: (String) -> Unit,
-    onSearchDoneClick: () -> Unit,
-    onLocationClick: () -> Unit,
-    onFavoriteIconClick: (favoriteCoordinate: FavoritesCoordinates, isFavorite: Boolean) -> Unit,
-    onRefresh: () -> Unit,
-    lazyListState: LazyListState = rememberLazyListState()
 ) {
 
     val pullToRefreshState = rememberPullToRefreshState()
 
-    Column(modifier = modifier) {
-        WeatherSearch(
-            searchInput = searchInput,
-            searchError = searchError,
-            errorMessageResId = errorMessageResId,
-            onSearchInputChanged = onSearchInputChanged,
-            onSearchDoneClick = onSearchDoneClick,
-            onLocationClick = onLocationClick,
+    Box(
+        modifier = modifier
+            .nestedScroll(pullToRefreshState.nestedScrollConnection)
+            .fillMaxSize()
+    ) {
+        when (uiState) {
+            is WeatherUiState.Loading -> WeatherLoading()
+            is WeatherUiState.Success -> WeatherContent(state = uiState.data, onAction = onAction)
+            is WeatherUiState.Error -> WeatherErrorScreen(errorMessageResId = uiState.errorMessageResId)
+        }
+
+        if (pullToRefreshState.isRefreshing) {
+            LaunchedEffect(true) {
+                onAction(WeatherScreenAction.RefreshScreenState)
+            }
+        }
+
+        LaunchedEffect(uiState.isRefreshing) {
+            if (uiState.isRefreshing) {
+                pullToRefreshState.startRefresh()
+            } else {
+                pullToRefreshState.endRefresh()
+            }
+        }
+
+        if (pullToRefreshState.progress > 0 || pullToRefreshState.isRefreshing) {
+            PullToRefreshContainer(
+                state = pullToRefreshState,
+                modifier = Modifier
+                    .align(Alignment.TopCenter),
+            )
+        }
+    }
+}
+
+@Composable
+internal fun WeatherContent(
+    state: WeatherViewState,
+    onAction: (WeatherScreenAction) -> Unit
+) {
+    val lazyListState: LazyListState = rememberLazyListState()
+
+    LazyColumn(
+        state = lazyListState,
+    ) {
+        item {
+            WeatherCard(
+                currentWeather = state.weather.currentWeather,
+                isFavorite = state.isFavorite,
+                onFavoriteIconClick = { favoritesCoordinates, isFavorites ->
+                    if (isFavorites){
+                        onAction(WeatherScreenAction.RemoveFromFavorites(favoritesCoordinates.id))
+                    } else{
+                        onAction(WeatherScreenAction.AddToFavorites(favoritesCoordinates))
+                    }
+                }
+            )
+        }
+        item {
+            SecondWeatherCard(currentWeather = state.weather.currentWeather)
+        }
+        item {
+            Text(
+                text = "Air pollution:",
+                fontSize = 24.sp,
+                modifier = Modifier.padding(start = 22.dp, top = 22.dp)
+            )
+        }
+        item {
+            AirCard(air = state.weather.air)
+        }
+        item {
+            Text(
+                text = "Weather forecast:",
+                fontSize = 24.sp,
+                modifier = Modifier.padding(start = 22.dp, top = 22.dp)
+            )
+        }
+        item {
+            ForecastCard(forecastList = state.weather.forecast)
+        }
+    }
+}
+
+@Composable
+internal fun WeatherLoading() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator(
+            modifier = Modifier.align(Alignment.Center),
+            color = MaterialTheme.colorScheme.surfaceTint
         )
-        Box(
-            modifier = Modifier
-                .nestedScroll(pullToRefreshState.nestedScrollConnection)
-                .fillMaxSize()
-        ) {
-            if (weatherViewState.weatherUiState != null) {
-                LazyColumn(
-                    state = lazyListState,
-                ) {
-                    item {
-                        WeatherCard(
-                            currentWeather = weatherViewState.weatherUiState.weather.currentWeather,
-                            weatherViewState.weatherUiState.isFavorite,
-                            onFavoriteIconClick = onFavoriteIconClick
-                        )
-                    }
-                    item {
-                        SecondWeatherCard(currentWeather = weatherViewState.weatherUiState.weather.currentWeather)
-                    }
-                    item {
-                        Text(
-                            text = "Air pollution:",
-                            fontSize = 24.sp,
-                            modifier = Modifier.padding(start = 22.dp, top = 22.dp)
-                        )
-                    }
-                    item {
-                        AirCard(air = weatherViewState.weatherUiState.weather.air)
-                    }
-                    item {
-                        Text(
-                            text = "Weather forecast:",
-                            fontSize = 24.sp,
-                            modifier = Modifier.padding(start = 22.dp, top = 22.dp)
-                        )
-                    }
-                    item {
-                        ForecastCard(forecastList = weatherViewState.weatherUiState.weather.forecast)
-                    }
+    }
+}
+
+@Composable
+private fun WeatherErrorScreen(errorMessageResId: Int) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            Box(modifier = Modifier.fillParentMaxSize()) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = stringResource(id = errorMessageResId),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
-            }
-
-            if (weatherViewState.errorMessageResId != null) {
-//            ErrorScreen(state.errorMessageId, onTryAgainClicked)
-            }
-
-            if (weatherViewState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.surfaceTint
-                )
-            }
-
-            if (pullToRefreshState.isRefreshing) {
-                LaunchedEffect(true) {
-                    onRefresh()
-                    Log.e("aaaLK", "onRefresh()")
-                }
-            }
-
-            LaunchedEffect(weatherViewState.isRefreshing) {
-                if (weatherViewState.isRefreshing) {
-                    pullToRefreshState.startRefresh()
-                } else {
-                    pullToRefreshState.endRefresh()
-                }
-            }
-
-            if (pullToRefreshState.progress > 0 || pullToRefreshState.isRefreshing) {
-                PullToRefreshContainer(
-                    state = pullToRefreshState,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter),
-                )
             }
         }
     }
@@ -173,26 +191,67 @@ internal fun WeatherScreen(
 
 @Preview(showBackground = true)
 @Composable
-internal fun ForecastCardPreview() {
+internal fun WeatherScreenPreview() {
     AppTheme {
         WeatherScreen(
-            weatherViewState = WeatherViewState(
-                searchInput = "",
-                searchError = false,
-                isLoading = false,
+            uiState = WeatherUiState.Success(
                 isRefreshing = false,
-                errorMessageResId = null,
-                weatherUiState = null
+                data = WeatherViewState(
+                    isLoading = false,
+                    weather = Weather(
+                        currentWeather = CurrentWeather(
+                            id = 0,
+                            coordinates = Coordinates(
+                                lon = "139.6917",
+                                lat = "35.6895"
+                            ),
+                            city = "Moscow",
+                            country = "RU",
+                            temperature = "22°C",
+                            icon = WeatherType.IC_UNKNOWN,
+                            description = "cloudy",
+                            feelsLike = "24°C",
+                            humidity = "44%",
+                            pressure = "1002hPa",
+                            windSpeed = "7m/c",
+                            data = "15.06.2024",
+                            timezone = 0,
+                        ),
+                        forecast = listOf(
+                            Forecast(
+                                temperature = "22",
+                                data = "Tue, 9 July 05:00",
+                                humidity = "44",
+                                weatherType = WeatherType.IC_02D
+                            ),
+                            Forecast(
+                                temperature = "15",
+                                data = "Tue, 9 July 08:00",
+                                humidity = "33",
+                                weatherType = WeatherType.IC_01N
+                            ),
+                            Forecast(
+                                temperature = "-4",
+                                data = "Tue, 9 July 11:00",
+                                humidity = "77",
+                                weatherType = WeatherType.IC_01D
+                            )
+                        ),
+                        air = Air(
+                            no2 = "0μg/m3",
+                            no2Quality = AirQuality.GOOD,
+                            o3 = "33μg/m3",
+                            o3Quality = AirQuality.MODERATE,
+                            pm10 = "155μg/m3",
+                            pm10Quality = AirQuality.POOR,
+                            pm25 = "",
+                            pm25Quality = AirQuality.ERROR,
+                        )
+                    ),
+                    isFavorite = true
+                )
             ),
-            searchInput = "",
-            searchError = false,
-            errorMessageResId = null,
-            modifier = Modifier,
-            onSearchInputChanged = {},
-            onSearchDoneClick = {},
-            onLocationClick = {},
-            onFavoriteIconClick = { _, _ -> },
-            onRefresh = {}
+            onAction = {}
         )
     }
 }

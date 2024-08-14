@@ -22,12 +22,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.designsystem.components.AppBackground
 import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
-import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.WeatherType
 import com.example.weatherforecastcompose.ui.DevicePreviews
 import com.example.weatherforecastcompose.ui.navigation.TopLevelDestination
@@ -46,16 +44,20 @@ fun FavoritesRoute(
 
     FavoritesScreen(
         uiState = uiState,
-        onItemClick = {
-            viewModel.obtainIntent(FavoritesScreenIntent.SetCoordinates(it))
-            navController.navigate(TopLevelDestination.Weather.name) {
-                popUpTo(0) { inclusive = true }
+        onAction = { action: FavoritesScreenAction ->
+            when (action) {
+                FavoritesScreenAction.RefreshScreenState -> viewModel.onAction(action)
+                is FavoritesScreenAction.RemoveFromFavorites -> viewModel.onAction(action)
+                is FavoritesScreenAction.SettingsChanged -> viewModel.onAction(action)
+
+                is FavoritesScreenAction.SetCoordinates -> {
+                    viewModel.onAction(action)
+                    navController.navigate(TopLevelDestination.Weather.name) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             }
         },
-        onFavoriteIconClick = { favoritesCoordinates ->
-            viewModel.obtainIntent(FavoritesScreenIntent.RemoveFromFavorites(favoritesCoordinates))
-        },
-        onRefresh = { viewModel.obtainIntent(FavoritesScreenIntent.RefreshScreenState) },
         modifier = modifier
     )
 }
@@ -65,9 +67,7 @@ fun FavoritesRoute(
 @Composable
 internal fun FavoritesScreen(
     uiState: FavoritesUiState,
-    onItemClick: (coordinates: Coordinates) -> Unit,
-    onFavoriteIconClick: (favoritesCoordinates: FavoritesCoordinates) -> Unit,
-    onRefresh: () -> Unit,
+    onAction: (FavoritesScreenAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -80,33 +80,18 @@ internal fun FavoritesScreen(
     ) {
 
         when (uiState) {
-            is FavoritesUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.surfaceTint
-                    )
-                }
-            }
+            is FavoritesUiState.Loading -> FavoritesLoading()
+            is FavoritesUiState.Success -> FavoritesContent(
+                favoriteList = uiState.data,
+                onAction = onAction
+            )
 
-            is FavoritesUiState.Empty -> FavoritesEmptyScreen()
-
-            is FavoritesUiState.Success -> {
-                FavoritesContent(
-                    favoriteList = uiState.data,
-                    onItemClick = onItemClick,
-                    onFavoriteIconClick = onFavoriteIconClick,
-                )
-            }
-
-            is FavoritesUiState.Error -> {
-                FavoritesErrorScreen(uiState.errorMessageResId)
-            }
+            is FavoritesUiState.Error -> FavoritesError(uiState.errorMessageResId)
         }
 
         if (pullToRefreshState.isRefreshing) {
             LaunchedEffect(true) {
-                onRefresh()
+                onAction(FavoritesScreenAction.RefreshScreenState)
             }
         }
 
@@ -129,21 +114,17 @@ internal fun FavoritesScreen(
 }
 
 @Composable
-private fun FavoritesEmptyScreen() {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item {
-            Box(modifier = Modifier.fillParentMaxSize()) {
-                Text(
-                    text = stringResource(id = R.string.error_empty_favorites),
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-        }
+internal fun FavoritesLoading() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator(
+            modifier = Modifier.align(Alignment.Center),
+            color = MaterialTheme.colorScheme.surfaceTint
+        )
     }
 }
 
 @Composable
-private fun FavoritesErrorScreen(errorMessageResId: Int) {
+private fun FavoritesError(errorMessageResId: Int) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
             Box(modifier = Modifier.fillParentMaxSize()) {
@@ -161,8 +142,7 @@ private fun FavoritesErrorScreen(errorMessageResId: Int) {
 @Composable
 internal fun FavoritesContent(
     favoriteList: FavoritesList,
-    onItemClick: (coordinates: Coordinates) -> Unit,
-    onFavoriteIconClick: (favoritesCoordinates: FavoritesCoordinates) -> Unit,
+    onAction: (FavoritesScreenAction) -> Unit,
     lazyListState: LazyListState = rememberLazyListState()
 ) {
     LazyColumn(
@@ -177,31 +157,12 @@ internal fun FavoritesContent(
             SwipeToDeleteContainer(
                 item = favoritesUiState,
                 onDelete = {
-                    onFavoriteIconClick(
-                        FavoritesCoordinates(
-                            id = favoritesUiState.id,
-                            coordinates = favoritesUiState.coordinates,
-                        )
-                    )
+                    onAction(FavoritesScreenAction.RemoveFromFavorites(favoritesUiState.id))
                 }) { data: CurrentWeather ->
                 FavoriteItemCard(currentWeather = data, onCardClick = {
-                    onItemClick(favoritesUiState.coordinates)
+                    onAction(FavoritesScreenAction.SetCoordinates(favoritesUiState.coordinates))
                 })
             }
-        }
-    }
-}
-
-@Composable
-@DevicePreviews
-fun FavoritesEmptyPreview() {
-    AppTheme {
-        AppBackground {
-            FavoritesScreen(
-                uiState = FavoritesUiState.Empty(),
-                onItemClick = {},
-                onFavoriteIconClick = {},
-                onRefresh = { /*TODO*/ })
         }
     }
 }
@@ -236,9 +197,8 @@ fun FavoritesSuccessPreview() {
                         )
                     )
                 ),
-                onItemClick = {},
-                onFavoriteIconClick = {},
-                onRefresh = { /*TODO*/ })
+                onAction = {}
+            )
         }
     }
 }

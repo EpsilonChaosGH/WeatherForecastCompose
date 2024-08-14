@@ -3,16 +3,16 @@ package com.example.weatherforecastcompose.ui.screens.favorites
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.weatherforecastcompose.R
 import com.example.weatherforecastcompose.data.FavoritesRepository
 import com.example.weatherforecastcompose.data.SettingsRepository
 import com.example.weatherforecastcompose.data.WeatherRepository
 import com.example.weatherforecastcompose.mappers.toResourceId
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
-import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.Settings
 import com.example.weatherforecastcompose.model.WeatherResult
-import com.example.weatherforecastcompose.ui.screens.IntentHandler
+import com.example.weatherforecastcompose.ui.screens.ActionHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +28,7 @@ class FavoritesViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val settings: SettingsRepository,
     private val favorites: FavoritesRepository
-) : ViewModel(), IntentHandler<FavoritesScreenIntent> {
+) : ViewModel(), ActionHandler<FavoritesScreenAction> {
 
     private val _settingsFlow = combine(
         settings.getLanguage(),
@@ -52,69 +52,54 @@ class FavoritesViewModel @Inject constructor(
 
     init {
         _settingsFlow
-            .onEach { obtainIntent(FavoritesScreenIntent.SettingsChanged(it)) }
+            .onEach { onAction(FavoritesScreenAction.SettingsChanged(it)) }
             .launchIn(viewModelScope)
     }
 
-    override fun obtainIntent(intent: FavoritesScreenIntent) {
-        Log.e("aaa_favorites_obtainIntent", "$intent")
+    override fun onAction(action: FavoritesScreenAction) {
         when (val state = state.value) {
-            is FavoritesUiState.Loading -> reduce(intent, state)
-            is FavoritesUiState.Empty -> reduce(intent, state)
-            is FavoritesUiState.Success -> reduce(intent, state)
-            is FavoritesUiState.Error -> reduce(intent, state)
+            is FavoritesUiState.Loading -> reduce(action, state)
+            is FavoritesUiState.Success -> reduce(action, state)
+            is FavoritesUiState.Error -> reduce(action, state)
         }
     }
 
-    private fun reduce(intent: FavoritesScreenIntent, state: FavoritesUiState.Loading) {
+    private fun reduce(intent: FavoritesScreenAction, state: FavoritesUiState.Loading) {
         when (intent) {
-            FavoritesScreenIntent.RefreshScreenState -> {
+            FavoritesScreenAction.RefreshScreenState -> {
                 _state.value = state.copy(isRefreshing = true)
                 getFavoritesCurrentWeather()
             }
 
-            is FavoritesScreenIntent.RemoveFromFavorites -> Unit
-            is FavoritesScreenIntent.SettingsChanged -> getFavoritesCurrentWeather()
-            is FavoritesScreenIntent.SetCoordinates -> Unit
+            is FavoritesScreenAction.RemoveFromFavorites -> Unit
+            is FavoritesScreenAction.SettingsChanged -> getFavoritesCurrentWeather()
+            is FavoritesScreenAction.SetCoordinates -> Unit
         }
     }
 
-    private fun reduce(intent: FavoritesScreenIntent, state: FavoritesUiState.Empty) {
+    private fun reduce(intent: FavoritesScreenAction, state: FavoritesUiState.Success) {
         when (intent) {
-            FavoritesScreenIntent.RefreshScreenState -> {
+            FavoritesScreenAction.RefreshScreenState -> {
                 _state.value = state.copy(isRefreshing = true)
                 getFavoritesCurrentWeather()
             }
 
-            is FavoritesScreenIntent.RemoveFromFavorites -> Unit
-            is FavoritesScreenIntent.SettingsChanged -> getFavoritesCurrentWeather()
-            is FavoritesScreenIntent.SetCoordinates -> Unit
+            is FavoritesScreenAction.RemoveFromFavorites -> removeFromFavorite(intent.id)
+            is FavoritesScreenAction.SettingsChanged -> getFavoritesCurrentWeather()
+            is FavoritesScreenAction.SetCoordinates -> setCoordinates(intent.coordinates)
         }
     }
 
-    private fun reduce(intent: FavoritesScreenIntent, state: FavoritesUiState.Success) {
+    private fun reduce(intent: FavoritesScreenAction, state: FavoritesUiState.Error) {
         when (intent) {
-            FavoritesScreenIntent.RefreshScreenState -> {
+            FavoritesScreenAction.RefreshScreenState -> {
                 _state.value = state.copy(isRefreshing = true)
                 getFavoritesCurrentWeather()
             }
 
-            is FavoritesScreenIntent.RemoveFromFavorites -> removeFromFavorite(intent.value)
-            is FavoritesScreenIntent.SettingsChanged -> getFavoritesCurrentWeather()
-            is FavoritesScreenIntent.SetCoordinates -> setCoordinates(intent.value)
-        }
-    }
-
-    private fun reduce(intent: FavoritesScreenIntent, state: FavoritesUiState.Error) {
-        when (intent) {
-            FavoritesScreenIntent.RefreshScreenState -> {
-                _state.value = state.copy(isRefreshing = true)
-                getFavoritesCurrentWeather()
-            }
-
-            is FavoritesScreenIntent.RemoveFromFavorites -> Unit
-            is FavoritesScreenIntent.SettingsChanged -> getFavoritesCurrentWeather()
-            is FavoritesScreenIntent.SetCoordinates -> Unit
+            is FavoritesScreenAction.RemoveFromFavorites -> Unit
+            is FavoritesScreenAction.SettingsChanged -> getFavoritesCurrentWeather()
+            is FavoritesScreenAction.SetCoordinates -> Unit
         }
     }
 
@@ -124,9 +109,9 @@ class FavoritesViewModel @Inject constructor(
         }
     }
 
-    private fun removeFromFavorite(favoritesCoordinates: FavoritesCoordinates) {
+    private fun removeFromFavorite(id: Long) {
         viewModelScope.launch {
-            favorites.removeFromFavorites(favoritesCoordinates)
+            favorites.removeFromFavorites(id)
         }
     }
 
@@ -155,7 +140,10 @@ class FavoritesViewModel @Inject constructor(
                 }
 
             } else {
-                _state.value = FavoritesUiState.Empty()
+                _state.value = FavoritesUiState.Error(
+                    isRefreshing = false,
+                    errorMessageResId = R.string.error_empty_favorites
+                )
             }
         }
     }
@@ -170,7 +158,6 @@ sealed interface FavoritesUiState {
     var isRefreshing: Boolean
 
     data class Loading(override var isRefreshing: Boolean = false) : FavoritesUiState
-    data class Empty(override var isRefreshing: Boolean = false) : FavoritesUiState
 
     data class Success(
         override var isRefreshing: Boolean = false,
@@ -178,6 +165,7 @@ sealed interface FavoritesUiState {
     ) : FavoritesUiState
 
     data class Error(
-        override var isRefreshing: Boolean = false, val errorMessageResId: Int
+        override var isRefreshing: Boolean = false,
+        val errorMessageResId: Int
     ) : FavoritesUiState
 }

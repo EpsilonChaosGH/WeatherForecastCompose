@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -44,21 +46,15 @@ fun SettingsRoute(
 
     SettingsScreen(
         uiState = uiState,
-        onLanguageChanged = { viewModel.obtainIntent(SettingsScreenIntent.ChangeLanguage(it)) },
-        onUnitChanged = { viewModel.obtainIntent(SettingsScreenIntent.ChangeUnits(it)) },
-        onDarkThemConfigChanged = {
-            viewModel.obtainIntent(SettingsScreenIntent.ChangeDarkThemConfig(it))
-        },
+        onAction = viewModel::onAction,
         modifier = modifier,
     )
 }
 
 @Composable
-fun SettingsScreen(
+internal fun SettingsScreen(
     uiState: SettingsUiState,
-    onLanguageChanged: (SupportedLanguage) -> Unit,
-    onUnitChanged: (Units) -> Unit,
-    onDarkThemConfigChanged: (DarkThemeConfig) -> Unit,
+    onAction: (SettingsScreenAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -66,36 +62,20 @@ fun SettingsScreen(
         Text(text = "SETTINGS", fontSize = 66.sp, modifier = Modifier.padding(12.dp))
 
         when (uiState) {
-            Loading -> {
-                Box(Modifier.fillMaxSize()) {
-                    Text(
-                        text = stringResource(R.string.title_loading),
-                        modifier = Modifier
-                            .padding(vertical = AppTheme.dimens.medium)
-                            .align(Alignment.Center)
-                    )
-                }
-            }
-
-            is Success -> {
-                SettingsContent(
-                    settings = uiState.data,
-                    onLanguageChanged = onLanguageChanged,
-                    onUnitChanged = onUnitChanged,
-                    onDarkThemConfigChanged = onDarkThemConfigChanged
-                )
-            }
+            is Loading -> SettingLoading()
+            is Success -> SettingsContent(
+                settings = uiState.data,
+                onAction = onAction
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsContent(
+internal fun SettingsContent(
     settings: UserEditableSettings,
-    onLanguageChanged: (SupportedLanguage) -> Unit,
-    onUnitChanged: (Units) -> Unit,
-    onDarkThemConfigChanged: (DarkThemeConfig) -> Unit,
+    onAction: (SettingsScreenAction) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val languageSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -118,7 +98,7 @@ fun SettingsContent(
             selectedItem = settings.selectedLanguage.toBottomSheetModel(true),
             items = settings.availableLanguages.map { it.toBottomSheetModel(isSelected = false) },
             onSaveState = { bottomSheet ->
-                onLanguageChanged(bottomSheet.toSupportedLanguage())
+                onAction(SettingsScreenAction.ChangeLanguage(bottomSheet.toSupportedLanguage()))
             }
         )
     }
@@ -142,7 +122,7 @@ fun SettingsContent(
             selectedItem = settings.selectedUnit.toBottomSheetModel(true),
             items = settings.availableUnits.map { it.toBottomSheetModel(isSelected = false) },
             onSaveState = { bottomSheet ->
-                onUnitChanged(bottomSheet.toUnits())
+                onAction(SettingsScreenAction.ChangeUnits((bottomSheet.toUnits())))
             }
         )
     }
@@ -166,8 +146,18 @@ fun SettingsContent(
             selectedItem = settings.selectedDarkThemConfig.toBottomSheetModel(true),
             items = settings.availableDarkThemConfig.map { it.toBottomSheetModel(isSelected = false) },
             onSaveState = { bottomSheet ->
-                onDarkThemConfigChanged(bottomSheet.toDarkThemConfig())
+                onAction(SettingsScreenAction.ChangeDarkThemConfig(bottomSheet.toDarkThemConfig()))
             }
+        )
+    }
+}
+
+@Composable
+internal fun SettingLoading() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator(
+            modifier = Modifier.align(Alignment.Center),
+            color = MaterialTheme.colorScheme.surfaceTint
         )
     }
 }
@@ -177,12 +167,7 @@ fun SettingsContent(
 fun SettingsScreenLoadingPreview() {
     AppTheme {
         AppBackground {
-            SettingsScreen(
-                Loading,
-                onLanguageChanged = {},
-                onUnitChanged = {},
-                onDarkThemConfigChanged = {}
-            )
+            SettingsScreen(uiState = Loading, onAction = {})
         }
     }
 }
@@ -193,16 +178,14 @@ fun SettingsScreenSuccessPreview() {
     AppTheme {
         AppBackground {
             SettingsScreen(
-                Success(
+                uiState = Success(
                     data = UserEditableSettings(
                         selectedLanguage = SupportedLanguage.ENGLISH,
                         selectedUnit = Units.METRIC,
                         selectedDarkThemConfig = DarkThemeConfig.FOLLOW_SYSTEM
                     )
                 ),
-                onLanguageChanged = {},
-                onUnitChanged = {},
-                onDarkThemConfigChanged = {}
+                onAction = {}
             )
         }
     }

@@ -7,7 +7,7 @@ import com.example.weatherforecastcompose.data.SettingsRepository
 import com.example.weatherforecastcompose.model.DarkThemeConfig
 import com.example.weatherforecastcompose.model.SupportedLanguage
 import com.example.weatherforecastcompose.model.Units
-import com.example.weatherforecastcompose.ui.screens.IntentHandler
+import com.example.weatherforecastcompose.ui.screens.ActionHandler
 import com.example.weatherforecastcompose.ui.screens.settings.SettingsUiState.Loading
 import com.example.weatherforecastcompose.ui.screens.settings.SettingsUiState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository
-) : ViewModel(), IntentHandler<SettingsScreenIntent> {
+) : ViewModel(), ActionHandler<SettingsScreenAction> {
 
     val settingUiState: StateFlow<SettingsUiState> = combine(
         settingsRepository.getLanguage(),
@@ -43,24 +43,25 @@ class SettingsViewModel @Inject constructor(
         initialValue = Loading
     )
 
-    override fun obtainIntent(intent: SettingsScreenIntent) {
-        when (intent) {
-            is SettingsScreenIntent.ChangeLanguage -> {
-                viewModelScope.launch {
-                    settingsRepository.setLanguage(intent.selectedLanguage)
-                }
+    override fun onAction(action: SettingsScreenAction) {
+        when (val state = settingUiState.value) {
+            is Loading -> Unit
+            is Success -> reduce(action, state)
+        }
+    }
+
+    private fun reduce(action: SettingsScreenAction, state: Success) {
+        when (action) {
+            is SettingsScreenAction.ChangeLanguage -> {
+                viewModelScope.launch { settingsRepository.setLanguage(action.selectedLanguage) }
             }
 
-            is SettingsScreenIntent.ChangeUnits -> {
-                viewModelScope.launch {
-                    settingsRepository.setUnits(intent.selectedUnits)
-                }
+            is SettingsScreenAction.ChangeUnits -> {
+                viewModelScope.launch { settingsRepository.setUnits(action.selectedUnits) }
             }
 
-            is SettingsScreenIntent.ChangeDarkThemConfig -> {
-                viewModelScope.launch {
-                    settingsRepository.setDarkThemConfig(intent.selectedConfig)
-                }
+            is SettingsScreenAction.ChangeDarkThemConfig -> {
+                viewModelScope.launch { settingsRepository.setDarkThemConfig(action.selectedConfig) }
             }
         }
     }
@@ -73,7 +74,6 @@ data class UserEditableSettings(
     val availableLanguages: List<SupportedLanguage> = SupportedLanguage.entries,
     val availableUnits: List<Units> = Units.entries,
     val availableDarkThemConfig: List<DarkThemeConfig> = DarkThemeConfig.entries,
-    val error: Throwable? = null
 )
 
 sealed interface SettingsUiState {

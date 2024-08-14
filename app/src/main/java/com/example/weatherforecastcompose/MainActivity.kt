@@ -47,8 +47,8 @@ class MainActivity : ComponentActivity() {
 
     private val permissionRequestLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            viewModel.obtainIntent(
-                MainIntent.PermissionResult(
+            viewModel.onAction(
+                MainAction.PermissionResult(
                     permission = Manifest.permission.ACCESS_COARSE_LOCATION,
                     isGranted = isGranted
                 )
@@ -94,10 +94,10 @@ class MainActivity : ComponentActivity() {
                             isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
                                 permission
                             ),
-                            onDismiss = { viewModel.obtainIntent(MainIntent.DismissPermissionDialog) },
-                            onOkClick = { viewModel.obtainIntent(MainIntent.DismissPermissionDialog) },
+                            onDismiss = { viewModel.onAction(MainAction.DismissPermissionDialog) },
+                            onOkClick = { viewModel.onAction(MainAction.DismissPermissionDialog) },
                             onGoToAppSettingsClick = {
-                                viewModel.obtainIntent(MainIntent.DismissPermissionDialog)
+                                viewModel.onAction(MainAction.DismissPermissionDialog)
                                 openAppSettings()
                             }
                         )
@@ -121,7 +121,7 @@ class MainActivity : ComponentActivity() {
                             lat = location.latitude.toString(),
                             lon = location.longitude.toString()
                         )
-                        viewModel.obtainIntent(MainIntent.ReceiveLocation(coordinates))
+                        viewModel.onAction(MainAction.ReceiveLocation(coordinates))
                     }
                 }
         }
