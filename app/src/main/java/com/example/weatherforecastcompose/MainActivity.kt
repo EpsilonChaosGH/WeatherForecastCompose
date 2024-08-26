@@ -9,35 +9,43 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.weatherforecastcompose.MainActivityUiState.*
-import com.example.weatherforecastcompose.model.Coordinates
+import com.example.weatherforecastcompose.data.network.NetworkMonitor
 import com.example.weatherforecastcompose.designsystem.components.CoarseLocationPermissionTextProvider
 import com.example.weatherforecastcompose.designsystem.components.PermissionDialog
-import com.example.weatherforecastcompose.ui.navigation.AppNavHost
 import com.example.weatherforecastcompose.designsystem.theme.AppTheme
+import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.DarkThemeConfig
+import com.example.weatherforecastcompose.ui.navigation.AppNavHost
+import com.example.weatherforecastcompose.ui.navigation.TopLevelDestination
+import com.example.weatherforecastcompose.ui.rememberAppState
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var networkMonitor: NetworkMonitor
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -48,7 +56,7 @@ class MainActivity : ComponentActivity() {
     private val permissionRequestLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             viewModel.onAction(
-                MainAction.PermissionResult(
+                MainActivityAction.PermissionResult(
                     permission = Manifest.permission.ACCESS_COARSE_LOCATION,
                     isGranted = isGranted
                 )
@@ -59,11 +67,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var uiState: MainActivityUiState by mutableStateOf(Loading)
+        var uiState: MainActivityUiState by mutableStateOf(
+            MainActivityUiState(
+                visiblePermissionDialogQueue = mutableStateListOf()
+            )
+        )
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState
+                viewModel.state
                     .onEach { uiState = it }
                     .collect()
             }
@@ -74,13 +86,30 @@ class MainActivity : ComponentActivity() {
         setContent {
             val darkTheme = shouldUseDarkTheme(uiState)
 
+            DisposableEffect(darkTheme) {
+                enableEdgeToEdge(
+                    statusBarStyle = SystemBarStyle.auto(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    ) { darkTheme },
+                    navigationBarStyle = SystemBarStyle.auto(
+                        lightScrim,
+                        darkScrim,
+                    ) { darkTheme },
+                )
+                onDispose {}
+            }
+
+            val appState = rememberAppState(networkMonitor = networkMonitor)
+
+            uiState.navigateToWeatherScreen.get()?.let {
+                appState.navigateToTopLevelDestination(TopLevelDestination.WEATHER)
+            }
+
             AppTheme(darkTheme = darkTheme) {
+                AppNavHost(appState = appState, onLocationClick = ::getCurrentCoordinate)
 
-                val viewModel = viewModel<MainViewModel>()
-
-                AppNavHost(onLocationClick = ::getCurrentCoordinate)
-
-                viewModel.visiblePermissionDialogQueue
+                uiState.visiblePermissionDialogQueue
                     .reversed()
                     .forEach { permission ->
                         PermissionDialog(
@@ -94,10 +123,10 @@ class MainActivity : ComponentActivity() {
                             isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
                                 permission
                             ),
-                            onDismiss = { viewModel.onAction(MainAction.DismissPermissionDialog) },
-                            onOkClick = { viewModel.onAction(MainAction.DismissPermissionDialog) },
+                            onDismiss = { viewModel.onAction(MainActivityAction.DismissPermissionDialog) },
+                            onOkClick = { viewModel.onAction(MainActivityAction.DismissPermissionDialog) },
                             onGoToAppSettingsClick = {
-                                viewModel.onAction(MainAction.DismissPermissionDialog)
+                                viewModel.onAction(MainActivityAction.DismissPermissionDialog)
                                 openAppSettings()
                             }
                         )
@@ -117,11 +146,14 @@ class MainActivity : ComponentActivity() {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     if (location != null) {
-                        val coordinates = Coordinates(
-                            lat = location.latitude.toString(),
-                            lon = location.longitude.toString()
+                        viewModel.onAction(
+                            MainActivityAction.ReceiveLocation(
+                                Coordinates(
+                                    lon = location.longitude.toString(),
+                                    lat = location.latitude.toString()
+                                )
+                            )
                         )
-                        viewModel.onAction(MainAction.ReceiveLocation(coordinates))
                     }
                 }
         }
@@ -138,11 +170,11 @@ fun Activity.openAppSettings() {
 @Composable
 private fun shouldUseDarkTheme(
     uiState: MainActivityUiState,
-): Boolean = when (uiState) {
-    Loading -> isSystemInDarkTheme()
-    is Success -> when (uiState.data) {
-        DarkThemeConfig.FOLLOW_SYSTEM -> isSystemInDarkTheme()
-        DarkThemeConfig.LIGHT -> false
-        DarkThemeConfig.DARK -> true
-    }
+): Boolean = when (uiState.darkThemeConfig) {
+    DarkThemeConfig.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+    DarkThemeConfig.LIGHT -> false
+    DarkThemeConfig.DARK -> true
 }
+
+private val lightScrim = android.graphics.Color.argb(0xe6, 0xFF, 0xFF, 0xFF)
+private val darkScrim = android.graphics.Color.argb(0x80, 0x1b, 0x1b, 0x1b)

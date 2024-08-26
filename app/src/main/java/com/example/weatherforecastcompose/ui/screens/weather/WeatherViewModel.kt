@@ -10,8 +10,9 @@ import com.example.weatherforecastcompose.mappers.toResourceId
 import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.Settings
 import com.example.weatherforecastcompose.model.Weather
-import com.example.weatherforecastcompose.model.WeatherResult
+import com.example.weatherforecastcompose.model.AppResult
 import com.example.weatherforecastcompose.ui.screens.ActionHandler
+import com.example.weatherforecastcompose.ui.screens.favorites.FavoritesUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
-    private val settings: SettingsRepository,
+    settings: SettingsRepository,
     private val favorites: FavoritesRepository,
 ) : ViewModel(), ActionHandler<WeatherScreenAction> {
 
@@ -45,76 +46,34 @@ class WeatherViewModel @Inject constructor(
         )
     }
 
-    private val _state: MutableStateFlow<WeatherUiState> =
-        MutableStateFlow(WeatherUiState.Loading())
-
+    private val _state: MutableStateFlow<WeatherUiState> = MutableStateFlow(WeatherUiState())
     val state: StateFlow<WeatherUiState> = _state.asStateFlow()
 
     init {
         _settingsFlow
-            .onEach { onAction(WeatherScreenAction.SettingsChanged(it)) }
+            .onEach { loadFavoritesWeather(it) }
             .launchIn(viewModelScope)
     }
 
     override fun onAction(action: WeatherScreenAction) {
-        when (val state = _state.value) {
-            is WeatherUiState.Loading -> reduce(action = action, state = state)
-            is WeatherUiState.Success -> reduce(action = action, state = state)
-            is WeatherUiState.Error -> reduce(action = action, state = state)
-        }
-    }
-
-    private fun reduce(action: WeatherScreenAction, state: WeatherUiState.Loading) {
         when (action) {
-            WeatherScreenAction.SearchWeatherByCoordinates -> Unit
-            is WeatherScreenAction.SettingsChanged -> getWeatherByCoordinates(action.settings)
-
-            WeatherScreenAction.RefreshScreenState -> {
-                _state.value = state.copy(isRefreshing = true)
-                viewModelScope.launch { getWeatherByCoordinates(_settingsFlow.first()) }
-            }
-
-            is WeatherScreenAction.AddToFavorites -> Unit
-            is WeatherScreenAction.RemoveFromFavorites -> Unit
-            WeatherScreenAction.PermissionsDenied -> TODO()
-        }
-    }
-
-    private fun reduce(action: WeatherScreenAction, state: WeatherUiState.Success) {
-        when (action) {
-            WeatherScreenAction.SearchWeatherByCoordinates -> Unit
-
-            is WeatherScreenAction.SettingsChanged -> {
-                _state.value = WeatherUiState.Success(
-                    isRefreshing = false,
-                    data = state.data.copy(isLoading = true)
-                )
-                getWeatherByCoordinates(action.settings)
-            }
-
-            WeatherScreenAction.RefreshScreenState -> {
-                _state.value = state.copy(isRefreshing = true)
-                viewModelScope.launch { getWeatherByCoordinates(_settingsFlow.first()) }
-            }
-
+            WeatherScreenAction.RefreshScreenState -> refreshState()
             is WeatherScreenAction.AddToFavorites -> addToFavorite(action.favoritesCoordinates)
             is WeatherScreenAction.RemoveFromFavorites -> removeFromFavorite(action.id)
-            WeatherScreenAction.PermissionsDenied -> TODO()
         }
     }
 
-    private fun reduce(action: WeatherScreenAction, state: WeatherUiState.Error) {
-        when (action) {
-            WeatherScreenAction.SearchWeatherByCoordinates -> Unit
-            is WeatherScreenAction.SettingsChanged -> getWeatherByCoordinates(action.settings)
-            WeatherScreenAction.RefreshScreenState -> {
-                _state.value = state.copy(isRefreshing = true)
-                viewModelScope.launch { getWeatherByCoordinates(_settingsFlow.first()) }
-            }
+    private fun loadFavoritesWeather(settings: Settings) {
+        viewModelScope.launch {
+            setState { copy(isLoading = true) }
+            getWeatherByCoordinates(settings)
+        }
+    }
 
-            is WeatherScreenAction.AddToFavorites -> Unit
-            is WeatherScreenAction.RemoveFromFavorites -> Unit
-            WeatherScreenAction.PermissionsDenied -> TODO()
+    private fun refreshState() {
+        viewModelScope.launch {
+            setState { copy(isRefreshing = true) }
+            getWeatherByCoordinates(_settingsFlow.first())
         }
     }
 
@@ -130,34 +89,6 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-//    private fun getWeatherByCity() {
-//        viewModelScope.launch {
-//            if (state.value.searchInput != "") {
-//                val result = weatherRepository.getCoordinatesByCity(City(state.value.searchInput))
-//
-//                when (result) {
-//                    is WeatherResult.Success -> settings.setCoordinates(result.data)
-//                    is WeatherResult.Error -> {
-//                        _state.update {
-//                            it.copy(
-//                                isLoading = false,
-//                                searchError = result.errorType == ErrorType.WRONG_CITY,
-//                                errorMessageResId = result.errorType.toResourceId(),
-//                            )
-//                        }
-//                    }
-//                }
-//            } else {
-//                _state.update {
-//                    it.copy(
-//                        searchError = true,
-//                        errorMessageResId = R.string.error_empty_city
-//                    )
-//                }
-//            }
-//        }
-//    }
-
     private fun getWeatherByCoordinates(settings: Settings) {
         viewModelScope.launch {
             val result = weatherRepository.getWeather(
@@ -169,72 +100,48 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-//    private fun refreshWeather() {
-//        viewModelScope.launch {
-//            _state.update { it.copy(isRefreshing = true) }
-//            getWeatherByCoordinates(_settingsFlow.first())
-//        }
-//    }
-
-    private fun processResult(result: WeatherResult<Weather>) {
+    private fun processResult(result: AppResult<Weather>) {
         viewModelScope.launch {
             when (result) {
-                is WeatherResult.Success -> {
-                    val weatherData = result.data
-                    _state.value = WeatherUiState.Success(
-                        data = WeatherViewState(
+                is AppResult.Success -> {
+                    val isFavorite = favorites.checkForFavorite(result.data.currentWeather.id)
+                    setState {
+                        copy(
+                            weather = result.data,
+                            isFavorite = isFavorite,
                             isLoading = false,
-                            weather = weatherData,
-                            isFavorite = favorites.checkForFavorite(weatherData.currentWeather.id)
+                            isRefreshing = false,
+                            errorMessageResId = null,
                         )
-                    )
+                    }
                 }
 
-                is WeatherResult.Error -> {
-                    _state.value = WeatherUiState.Error(
-                        errorMessageResId = result.errorType.toResourceId()
-                    )
+                is AppResult.Error -> {
+                    setState {
+                        copy(
+                            weather = null,
+                            isFavorite = false,
+                            isLoading = false,
+                            isRefreshing = false,
+                            errorMessageResId = result.errorType.toResourceId(),
+                        )
+                    }
                 }
             }
         }
     }
+
+    private fun setState(stateReducer: WeatherUiState.() -> WeatherUiState) {
+        viewModelScope.launch {
+            _state.emit(stateReducer(state.value))
+        }
+    }
 }
 
-data class WeatherViewState(
-//    val searchInput: String,
-//    val searchError: Boolean,
-    val isLoading: Boolean,
-//    val isRefreshing: Boolean,
-//    val errorMessageResId: Int?,
-    val weather: Weather,
-    val isFavorite: Boolean
+data class WeatherUiState(
+    val weather: Weather? = null,
+    val isFavorite: Boolean = false,
+    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val errorMessageResId: Int? = null
 )
-
-//data class WeatherUiState1(
-//    val weather: Weather,
-//    val isFavorite: Boolean
-//)
-
-sealed interface WeatherUiState {
-    var isRefreshing: Boolean
-
-    data class Loading(override var isRefreshing: Boolean = false) : WeatherUiState
-
-    data class Success(
-        override var isRefreshing: Boolean = false,
-        val data: WeatherViewState
-    ) : WeatherUiState
-
-    data class Error(
-        override var isRefreshing: Boolean = false, val errorMessageResId: Int
-    ) : WeatherUiState
-}
-
-//sealed class SearchState {
-//
-//    val inputValue: String = ""
-//
-//    data object Success : SearchState()
-//
-//    data class Error(val errorMessageResId: Int) : SearchState()
-//}

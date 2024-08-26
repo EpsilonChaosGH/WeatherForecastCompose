@@ -1,6 +1,8 @@
 package com.example.weatherforecastcompose.di
 
-import com.example.weatherforecastcompose.utils.AppId
+import android.content.Context
+import com.example.weatherforecastcompose.data.network.ConnectivityManagerNetworkMonitor
+import com.example.weatherforecastcompose.data.network.NetworkMonitor
 import com.example.weatherforecastcompose.data.network.services.AirService
 import com.example.weatherforecastcompose.data.network.services.ForecastService
 import com.example.weatherforecastcompose.data.network.services.GeocodingService
@@ -10,8 +12,8 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -47,26 +49,14 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideInterceptor(): Interceptor {
-        return Interceptor { chain ->
-            val request = chain.request()
-            val url = request.url.newBuilder().addQueryParameter("appid", AppId.APP_ID).build()
-            chain.proceed(request.newBuilder().url(url).build())
-        }
-    }
-
-    @Provides
-    @Singleton
     fun provideMoshi(): Moshi {
         return Moshi.Builder().build()
     }
 
     @Provides
     @Singleton
-    fun provideClient(interceptor: Interceptor): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(interceptor)
-            .build()
+    fun provideClient(): OkHttpClient {
+        return OkHttpClient.Builder().build()
     }
 
     @Provides
@@ -77,5 +67,10 @@ object NetworkModule {
             .client(client)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
+    }
+
+    @Provides
+    fun provideNetworkMonitor(@ApplicationContext context: Context): NetworkMonitor {
+        return ConnectivityManagerNetworkMonitor(context = context)
     }
 }

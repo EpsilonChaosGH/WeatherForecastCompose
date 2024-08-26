@@ -8,10 +8,10 @@ import com.example.weatherforecastcompose.data.FavoritesRepository
 import com.example.weatherforecastcompose.data.SettingsRepository
 import com.example.weatherforecastcompose.data.WeatherRepository
 import com.example.weatherforecastcompose.mappers.toResourceId
+import com.example.weatherforecastcompose.model.AppResult
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
 import com.example.weatherforecastcompose.model.Settings
-import com.example.weatherforecastcompose.model.WeatherResult
 import com.example.weatherforecastcompose.ui.screens.ActionHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,66 +46,34 @@ class FavoritesViewModel @Inject constructor(
     }
 
     private val _state: MutableStateFlow<FavoritesUiState> =
-        MutableStateFlow(FavoritesUiState.Loading())
+        MutableStateFlow(FavoritesUiState(favoritesItems = emptyList()))
     val state = _state.asStateFlow()
-
 
     init {
         _settingsFlow
-            .onEach { onAction(FavoritesScreenAction.SettingsChanged(it)) }
+            .onEach { settings -> loadFavoritesWeather(settings) }
             .launchIn(viewModelScope)
     }
 
     override fun onAction(action: FavoritesScreenAction) {
-        when (val state = state.value) {
-            is FavoritesUiState.Loading -> reduce(action, state)
-            is FavoritesUiState.Success -> reduce(action, state)
-            is FavoritesUiState.Error -> reduce(action, state)
+        when (action) {
+            FavoritesScreenAction.RefreshScreenState -> refreshState()
+            is FavoritesScreenAction.RemoveFromFavorites -> removeFromFavorite(action.id)
+            is FavoritesScreenAction.FavoritesItemClicked -> setCoordinates(action.coordinates)
         }
     }
 
-    private fun reduce(intent: FavoritesScreenAction, state: FavoritesUiState.Loading) {
-        when (intent) {
-            FavoritesScreenAction.RefreshScreenState -> {
-                _state.value = state.copy(isRefreshing = true)
-                getFavoritesCurrentWeather()
-            }
-
-            is FavoritesScreenAction.RemoveFromFavorites -> Unit
-            is FavoritesScreenAction.SettingsChanged -> getFavoritesCurrentWeather()
-            is FavoritesScreenAction.SetCoordinates -> Unit
-        }
-    }
-
-    private fun reduce(intent: FavoritesScreenAction, state: FavoritesUiState.Success) {
-        when (intent) {
-            FavoritesScreenAction.RefreshScreenState -> {
-                _state.value = state.copy(isRefreshing = true)
-                getFavoritesCurrentWeather()
-            }
-
-            is FavoritesScreenAction.RemoveFromFavorites -> removeFromFavorite(intent.id)
-            is FavoritesScreenAction.SettingsChanged -> getFavoritesCurrentWeather()
-            is FavoritesScreenAction.SetCoordinates -> setCoordinates(intent.coordinates)
-        }
-    }
-
-    private fun reduce(intent: FavoritesScreenAction, state: FavoritesUiState.Error) {
-        when (intent) {
-            FavoritesScreenAction.RefreshScreenState -> {
-                _state.value = state.copy(isRefreshing = true)
-                getFavoritesCurrentWeather()
-            }
-
-            is FavoritesScreenAction.RemoveFromFavorites -> Unit
-            is FavoritesScreenAction.SettingsChanged -> getFavoritesCurrentWeather()
-            is FavoritesScreenAction.SetCoordinates -> Unit
-        }
-    }
-
-    private fun setCoordinates(coordinates: Coordinates) {
+    private fun loadFavoritesWeather(settings: Settings) {
         viewModelScope.launch {
-            settings.setCoordinates(coordinates)
+            setState { copy(isLoading = true) }
+            getFavoritesCurrentWeather(settings)
+        }
+    }
+
+    private fun refreshState() {
+        viewModelScope.launch {
+            setState { copy(isRefreshing = true) }
+            getFavoritesCurrentWeather(_settingsFlow.first())
         }
     }
 
@@ -115,57 +83,62 @@ class FavoritesViewModel @Inject constructor(
         }
     }
 
-    private fun getFavoritesCurrentWeather() {
+    private fun setCoordinates(coordinates: Coordinates) {
         viewModelScope.launch {
-            val settings = _settingsFlow.first()
-            if (settings.favoriteSet.isNotEmpty()) {
-                val result = weatherRepository.getFavoritesCurrentWeather(
-                    settings.favoriteSet.map { it.coordinates },
-                    language = settings.language,
-                    units = settings.units
-                )
-                when (result) {
-                    is WeatherResult.Success -> {
-                        _state.value = FavoritesUiState.Success(
-                            data = FavoritesList(
-                                favoritesUiState = result.data.map { it }
-                            )
-                        )
-                    }
+            settings.setCoordinates(coordinates)
+        }
+    }
 
-                    is WeatherResult.Error -> {
-                        _state.value =
-                            FavoritesUiState.Error(errorMessageResId = result.errorType.toResourceId())
+    private suspend fun getFavoritesCurrentWeather(settings: Settings) {
+        if (settings.favoriteSet.isNotEmpty()) {
+            val result = weatherRepository.getFavoritesCurrentWeather(
+                settings.favoriteSet.map { it.coordinates },
+                language = settings.language,
+                units = settings.units
+            )
+            when (result) {
+                is AppResult.Success -> {
+                    setState {
+                        copy(
+                            favoritesItems = result.data,
+                            isLoading = false,
+                            isRefreshing = false,
+                            errorMessageResId = null,
+                        )
                     }
                 }
 
-            } else {
-                _state.value = FavoritesUiState.Error(
+                is AppResult.Error -> {
+                    setState {
+                        copy(
+                            isLoading = false,
+                            isRefreshing = false,
+                            errorMessageResId = result.errorType.toResourceId(),
+                        )
+                    }
+                }
+            }
+        } else {
+            setState {
+                copy(
+                    isLoading = false,
                     isRefreshing = false,
-                    errorMessageResId = R.string.error_empty_favorites
+                    errorMessageResId = R.string.error_empty_favorites,
                 )
             }
         }
     }
+
+    private fun setState(stateReducer: FavoritesUiState.() -> FavoritesUiState) {
+        viewModelScope.launch {
+            _state.emit(stateReducer(state.value))
+        }
+    }
 }
 
-
-data class FavoritesList(
-    val favoritesUiState: List<CurrentWeather>
+data class FavoritesUiState(
+    val favoritesItems: List<CurrentWeather>,
+    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val errorMessageResId: Int? = null
 )
-
-sealed interface FavoritesUiState {
-    var isRefreshing: Boolean
-
-    data class Loading(override var isRefreshing: Boolean = false) : FavoritesUiState
-
-    data class Success(
-        override var isRefreshing: Boolean = false,
-        val data: FavoritesList
-    ) : FavoritesUiState
-
-    data class Error(
-        override var isRefreshing: Boolean = false,
-        val errorMessageResId: Int
-    ) : FavoritesUiState
-}

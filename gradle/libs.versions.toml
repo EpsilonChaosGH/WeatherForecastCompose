@@ -2,16 +2,18 @@
 agp = "8.5.2"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
+androidxCoreSplashscreen = "1.0.1"
+kotlinxDatetime = "0.5.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-lifecycleRuntimeKtx = "2.8.2"
-activityCompose = "1.9.0"
-composeBom = "2024.06.00"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+lifecycleRuntimeKtx = "2.8.4"
+activityCompose = "1.9.1"
+composeBom = "2024.08.00"
 play-services-location = "21.3.0"
-androidxNavigation = "2.8.0-beta03"
+androidxNavigation = "2.8.0-rc01"
 androidxHiltNavigationCompose = "1.2.0"
-hilt = "2.51.1"
+hilt = "2.52"
 okhttp = "4.12.0"
 retrofit = "2.9.0"
 datastore = "1.1.1"
@@ -20,6 +22,8 @@ ksp = "2.0.0-1.0.21"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

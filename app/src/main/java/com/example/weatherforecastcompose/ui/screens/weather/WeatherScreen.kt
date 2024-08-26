@@ -1,8 +1,6 @@
 package com.example.weatherforecastcompose.ui.screens.weather
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,7 +29,6 @@ import com.example.weatherforecastcompose.model.Air
 import com.example.weatherforecastcompose.model.AirQuality
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.CurrentWeather
-import com.example.weatherforecastcompose.model.FavoritesCoordinates
 import com.example.weatherforecastcompose.model.Forecast
 import com.example.weatherforecastcompose.model.Weather
 import com.example.weatherforecastcompose.model.WeatherType
@@ -39,13 +36,11 @@ import com.example.weatherforecastcompose.ui.screens.weather.components.AirCard
 import com.example.weatherforecastcompose.ui.screens.weather.components.ForecastCard
 import com.example.weatherforecastcompose.ui.screens.weather.components.SecondWeatherCard
 import com.example.weatherforecastcompose.ui.screens.weather.components.WeatherCard
-import com.example.weatherforecastcompose.ui.screens.weather.components.WeatherSearch
 
 
 @Composable
 internal fun WeatherRoute(
-    onLocationClick: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
 
@@ -53,20 +48,9 @@ internal fun WeatherRoute(
 
     WeatherScreen(
         uiState = uiState,
-        onAction = { action ->
-            Log.e("aaaWW",action.toString())
-            when (action) {
-                is WeatherScreenAction.AddToFavorites -> viewModel.onAction(action)
-                WeatherScreenAction.PermissionsDenied -> viewModel.onAction(action)
-                WeatherScreenAction.RefreshScreenState -> viewModel.onAction(action)
-                is WeatherScreenAction.RemoveFromFavorites -> viewModel.onAction(action)
-                is WeatherScreenAction.SearchWeatherByCoordinates -> onLocationClick()
-                is WeatherScreenAction.SettingsChanged -> viewModel.onAction(action)
-            }
-        },
+        onAction = viewModel::onAction,
         modifier = modifier,
     )
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,10 +68,21 @@ internal fun WeatherScreen(
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
             .fillMaxSize()
     ) {
-        when (uiState) {
-            is WeatherUiState.Loading -> WeatherLoading()
-            is WeatherUiState.Success -> WeatherContent(state = uiState.data, onAction = onAction)
-            is WeatherUiState.Error -> WeatherErrorScreen(errorMessageResId = uiState.errorMessageResId)
+
+        if (uiState.errorMessageResId == null) {
+            uiState.weather?.let {
+                WeatherContent(
+                    weather = uiState.weather,
+                    isFavorite = uiState.isFavorite,
+                    onAction = onAction
+                )
+            }
+        } else {
+            WeatherErrorScreen(uiState.errorMessageResId)
+        }
+
+        if (uiState.isLoading) {
+            WeatherLoading()
         }
 
         if (pullToRefreshState.isRefreshing) {
@@ -116,7 +111,8 @@ internal fun WeatherScreen(
 
 @Composable
 internal fun WeatherContent(
-    state: WeatherViewState,
+    weather: Weather,
+    isFavorite: Boolean,
     onAction: (WeatherScreenAction) -> Unit
 ) {
     val lazyListState: LazyListState = rememberLazyListState()
@@ -126,19 +122,19 @@ internal fun WeatherContent(
     ) {
         item {
             WeatherCard(
-                currentWeather = state.weather.currentWeather,
-                isFavorite = state.isFavorite,
+                currentWeather = weather.currentWeather,
+                isFavorite = isFavorite,
                 onFavoriteIconClick = { favoritesCoordinates, isFavorites ->
-                    if (isFavorites){
+                    if (isFavorites) {
                         onAction(WeatherScreenAction.RemoveFromFavorites(favoritesCoordinates.id))
-                    } else{
+                    } else {
                         onAction(WeatherScreenAction.AddToFavorites(favoritesCoordinates))
                     }
                 }
             )
         }
         item {
-            SecondWeatherCard(currentWeather = state.weather.currentWeather)
+            SecondWeatherCard(currentWeather = weather.currentWeather)
         }
         item {
             Text(
@@ -148,7 +144,7 @@ internal fun WeatherContent(
             )
         }
         item {
-            AirCard(air = state.weather.air)
+            AirCard(air = weather.air)
         }
         item {
             Text(
@@ -158,7 +154,7 @@ internal fun WeatherContent(
             )
         }
         item {
-            ForecastCard(forecastList = state.weather.forecast)
+            ForecastCard(forecastList = weather.forecast)
         }
     }
 }
@@ -194,62 +190,61 @@ private fun WeatherErrorScreen(errorMessageResId: Int) {
 internal fun WeatherScreenPreview() {
     AppTheme {
         WeatherScreen(
-            uiState = WeatherUiState.Success(
-                isRefreshing = false,
-                data = WeatherViewState(
-                    isLoading = false,
-                    weather = Weather(
-                        currentWeather = CurrentWeather(
-                            id = 0,
-                            coordinates = Coordinates(
-                                lon = "139.6917",
-                                lat = "35.6895"
-                            ),
-                            city = "Moscow",
-                            country = "RU",
-                            temperature = "22°C",
-                            icon = WeatherType.IC_UNKNOWN,
-                            description = "cloudy",
-                            feelsLike = "24°C",
-                            humidity = "44%",
-                            pressure = "1002hPa",
-                            windSpeed = "7m/c",
-                            data = "15.06.2024",
-                            timezone = 0,
+            uiState = WeatherUiState(
+                weather = Weather(
+                    currentWeather = CurrentWeather(
+                        id = 0,
+                        coordinates = Coordinates(
+                            lon = "139.6917",
+                            lat = "35.6895"
                         ),
-                        forecast = listOf(
-                            Forecast(
-                                temperature = "22",
-                                data = "Tue, 9 July 05:00",
-                                humidity = "44",
-                                weatherType = WeatherType.IC_02D
-                            ),
-                            Forecast(
-                                temperature = "15",
-                                data = "Tue, 9 July 08:00",
-                                humidity = "33",
-                                weatherType = WeatherType.IC_01N
-                            ),
-                            Forecast(
-                                temperature = "-4",
-                                data = "Tue, 9 July 11:00",
-                                humidity = "77",
-                                weatherType = WeatherType.IC_01D
-                            )
+                        city = "Moscow",
+                        country = "RU",
+                        temperature = "22°C",
+                        icon = WeatherType.IC_UNKNOWN,
+                        description = "cloudy",
+                        feelsLike = "24°C",
+                        humidity = "44%",
+                        pressure = "1002hPa",
+                        windSpeed = "7m/c",
+                        data = "15.06.2024",
+                        timezone = 0,
+                    ),
+                    forecast = listOf(
+                        Forecast(
+                            temperature = "22",
+                            data = "Tue, 9 July 05:00",
+                            humidity = "44",
+                            weatherType = WeatherType.IC_02D
                         ),
-                        air = Air(
-                            no2 = "0μg/m3",
-                            no2Quality = AirQuality.GOOD,
-                            o3 = "33μg/m3",
-                            o3Quality = AirQuality.MODERATE,
-                            pm10 = "155μg/m3",
-                            pm10Quality = AirQuality.POOR,
-                            pm25 = "",
-                            pm25Quality = AirQuality.ERROR,
+                        Forecast(
+                            temperature = "15",
+                            data = "Tue, 9 July 08:00",
+                            humidity = "33",
+                            weatherType = WeatherType.IC_01N
+                        ),
+                        Forecast(
+                            temperature = "-4",
+                            data = "Tue, 9 July 11:00",
+                            humidity = "77",
+                            weatherType = WeatherType.IC_01D
                         )
                     ),
-                    isFavorite = true
-                )
+                    air = Air(
+                        no2 = "0μg/m3",
+                        no2Quality = AirQuality.GOOD,
+                        o3 = "33μg/m3",
+                        o3Quality = AirQuality.MODERATE,
+                        pm10 = "155μg/m3",
+                        pm10Quality = AirQuality.POOR,
+                        pm25 = "",
+                        pm25Quality = AirQuality.ERROR,
+                    )
+                ),
+                isRefreshing = false,
+                isLoading = false,
+
+                isFavorite = true
             ),
             onAction = {}
         )

@@ -1,18 +1,20 @@
 package com.example.weatherforecastcompose
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherforecastcompose.MainActivityUiState.Loading
-import com.example.weatherforecastcompose.MainActivityUiState.Success
 import com.example.weatherforecastcompose.data.SettingsRepository
 import com.example.weatherforecastcompose.model.Coordinates
 import com.example.weatherforecastcompose.model.DarkThemeConfig
 import com.example.weatherforecastcompose.ui.screens.ActionHandler
+import com.example.weatherforecastcompose.utils.AppSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,67 +22,67 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val settings: SettingsRepository
-) : ViewModel(), ActionHandler<MainAction> {
+) : ViewModel(), ActionHandler<MainActivityAction> {
 
-    val visiblePermissionDialogQueue = mutableStateListOf<String>()
+    private val _state =
+        MutableStateFlow(MainActivityUiState(visiblePermissionDialogQueue = mutableStateListOf()))
+    val state: StateFlow<MainActivityUiState> = _state.asStateFlow()
 
-    val uiState: StateFlow<MainActivityUiState> = settings.getDarkThemConfig().map {
-        Success(it)
-    }.stateIn(
-        scope = viewModelScope,
-        initialValue = Loading,
-        started = SharingStarted.WhileSubscribed(5_000),
-    )
-
-    override fun onAction(action: MainAction) {
-        when (val state = uiState.value) {
-            Loading -> Unit
-            is Success -> reduce(action = action, state = state)
-        }
+    init {
+        settings.getDarkThemConfig()
+            .onEach { searchQueries ->
+                setState { copy(darkThemeConfig = searchQueries) }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null,
+            )
     }
 
-    private fun reduce(action: MainAction, state: Success) {
+    override fun onAction(action: MainActivityAction) {
         when (action) {
-            MainAction.DismissPermissionDialog -> dismissDialog()
-            is MainAction.PermissionResult -> onPermissionResult(
+            MainActivityAction.DismissPermissionDialog -> dismissDialog()
+            is MainActivityAction.PermissionResult -> onPermissionResult(
                 permission = action.permission,
                 isGranted = action.isGranted
             )
 
-            is MainAction.ReceiveLocation -> setCoordinates(action.coordinates)
+            is MainActivityAction.ReceiveLocation -> setCoordinatesAndNavigate(action.coordinates)
         }
     }
 
-    private fun setCoordinates(coordinates: Coordinates) {
+    private fun setCoordinatesAndNavigate(coordinates: Coordinates) {
         viewModelScope.launch {
             settings.setCoordinates(coordinates)
+            setState {
+                copy(navigateToWeatherScreen = AppSideEffect(Unit))
+            }
         }
     }
 
     private fun dismissDialog() {
-        visiblePermissionDialogQueue.removeFirst()
+        state.value.visiblePermissionDialogQueue.removeFirst()
     }
 
     private fun onPermissionResult(
         permission: String,
         isGranted: Boolean
     ) {
-        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
-            visiblePermissionDialogQueue.add(permission)
+        if (!isGranted && !state.value.visiblePermissionDialogQueue.contains(permission)) {
+            state.value.visiblePermissionDialogQueue.add(permission)
+        }
+    }
+
+    private fun setState(stateReducer: MainActivityUiState.() -> MainActivityUiState) {
+        viewModelScope.launch {
+            _state.emit(stateReducer(state.value))
         }
     }
 }
 
-sealed interface MainAction {
-
-    data object DismissPermissionDialog : MainAction
-
-    data class PermissionResult(val permission: String, val isGranted: Boolean) : MainAction
-
-    data class ReceiveLocation(val coordinates: Coordinates) : MainAction
-}
-
-sealed interface MainActivityUiState {
-    data object Loading : MainActivityUiState
-    data class Success(val data: DarkThemeConfig) : MainActivityUiState
-}
+data class MainActivityUiState(
+    val darkThemeConfig: DarkThemeConfig = DarkThemeConfig.FOLLOW_SYSTEM,
+    val visiblePermissionDialogQueue: SnapshotStateList<String>,
+    val navigateToWeatherScreen: AppSideEffect<Unit?> = AppSideEffect(null)
+)

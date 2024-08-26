@@ -12,8 +12,10 @@
     <string name="image_content_description_is_favorite">Favorite</string>
     <string name="image_content_description_search">Search weather</string>
     <string name="image_content_description_search_error">Search weather error</string>
+    <string name="image_content_description_close">Close</string>
     <string name="image_content_description_humidity">Humidity</string>
     <string name="image_content_description_temperature">Temperature</string>
+    <string name="image_content_description_back_button">Back button</string>
 
 
     <string name="title_search">Search</string>
@@ -33,7 +35,10 @@
     <string name="title_units">Units:</string>
     <string name="title_dark_mode">Dark mode:</string>
 
+    <string name="title_recent_searches">Recent searches</string>
+
     <string name="bt_save">Save</string>
+    <string name="bt_clear_recent_searches">Clear searches</string>
 
     <!--    Permissions-->
     <string name="location_rationale_title">Permission Request</string>
@@ -48,8 +53,9 @@
     <string name="error_generic">Something is happening that\'s disturbing the force :(</string>
     <string name="error_connection">Check your internet connection and try again</string>
     <string name="error_wrong_city">Nothing was found for your request.</string>
-    <string name="error_empty_city">Please enter the location name.</string>
+    <string name="error_empty_search">Please enter the location name.</string>
     <string name="error_empty_favorites">No favorites yet.</string>
+    <string name="error_not_connected">⚠️ You aren’t connected to the internet</string>
 
 
     <!-- Air quality -->

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.weatherforecastcompose.data.local.room.AppDatabase
 import com.example.weatherforecastcompose.data.local.room.FavoritesDao
+import com.example.weatherforecastcompose.data.local.room.RecentSearchQueryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,5 +27,9 @@ object RoomModule {
 
     @Provides
     @Singleton
-    fun favoritesDao(db: AppDatabase): FavoritesDao = db.favoritesDao()
+    fun providesFavoritesDao(db: AppDatabase): FavoritesDao = db.favoritesDao()
+
+    @Provides
+    fun providesRecentSearchQueryDao(database: AppDatabase): RecentSearchQueryDao =
+        database.recentSearchQueryDao()
 }

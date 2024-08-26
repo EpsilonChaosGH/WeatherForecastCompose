@@ -2,11 +2,10 @@ package com.example.weatherforecastcompose.mappers
 
 import androidx.annotation.StringRes
 import com.example.weatherforecastcompose.R
+import com.example.weatherforecastcompose.model.ErrorType
 import com.example.weatherforecastcompose.utils.ClientException
 import com.example.weatherforecastcompose.utils.GenericException
 import com.example.weatherforecastcompose.utils.ServerException
-import com.example.weatherforecastcompose.utils.WrongCityException
-import com.example.weatherforecastcompose.model.ErrorType
 import retrofit2.Response
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -30,10 +29,10 @@ fun ErrorType.toResourceId(): Int = when (this) {
     ErrorType.GENERIC -> R.string.error_generic
     ErrorType.IO_CONNECTION -> R.string.error_connection
     ErrorType.CLIENT -> R.string.error_client
-    ErrorType.WRONG_CITY -> R.string.error_wrong_city
 }
 
 fun mapResponseCodeToThrowable(code: Int): Throwable = when (code) {
+    HttpURLConnection.HTTP_OK -> ClientException("Empty response body : $code: Check request parameters")
     HttpURLConnection.HTTP_BAD_REQUEST -> ClientException("Bad request : $code: Check request parameters")
     HttpURLConnection.HTTP_UNAUTHORIZED -> ClientException("Unauthorized access : $code: Check API Token")
     HttpURLConnection.HTTP_NOT_FOUND -> ClientException("Resource not found : $code: Check parameters")
@@ -45,7 +44,6 @@ fun mapResponseCodeToThrowable(code: Int): Throwable = when (code) {
 
 fun mapThrowableToErrorType(throwable: Throwable): ErrorType {
     val errorType = when (throwable) {
-        is WrongCityException -> ErrorType.WRONG_CITY
         is IOException -> ErrorType.IO_CONNECTION
         is ClientException -> ErrorType.CLIENT
         is ServerException -> ErrorType.SERVER

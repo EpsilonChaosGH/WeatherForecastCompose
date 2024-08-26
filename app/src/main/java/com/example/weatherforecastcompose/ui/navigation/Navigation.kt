@@ -1,117 +1,147 @@
 package com.example.weatherforecastcompose.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration.Indefinite
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.example.weatherforecastcompose.ui.screens.favorites.FavoritesRoute
-import com.example.weatherforecastcompose.ui.screens.settings.SettingsRoute
-import com.example.weatherforecastcompose.ui.screens.weather.WeatherRoute
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
+import com.example.weatherforecastcompose.R
+import com.example.weatherforecastcompose.designsystem.components.WeatherTopAppBar
+import com.example.weatherforecastcompose.ui.AppState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavHost(
+    appState: AppState,
     onLocationClick: () -> Unit,
-    navController: NavHostController = rememberNavController(),
 ) {
+    val snackBarHostState = remember { SnackbarHostState() }
+    val isOffline by appState.isOffline.collectAsStateWithLifecycle()
+
+    val notConnectedMessage = stringResource(R.string.error_not_connected)
+    LaunchedEffect(isOffline) {
+        if (isOffline) {
+            snackBarHostState.showSnackbar(
+                message = notConnectedMessage,
+                duration = Indefinite,
+            )
+        }
+    }
+
     Scaffold(
         bottomBar = {
-            BottomAppBar(
-//                containerColor = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.height(80.dp)
-            ) {
-                val backStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = backStackEntry?.destination?.route
+            BottomAppBar(modifier = Modifier.height(80.dp)) {
 
-                TopLevelDestination.entries.forEach {
+                val currentDestination = appState.currentDestination
+
+                appState.topLevelDestinations.forEach { destination ->
+                    val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
                     NavigationBarItem(
-                        selected = currentRoute == it.name,
-                        onClick = {
-                            navController.navigate(it.name) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                popUpTo(0) { inclusive = true }
-                            }
-                        },
+                        selected = selected,
+                        onClick = { appState.navigateToTopLevelDestination(destination) },
                         icon = {
-                            Icon(modifier = Modifier.size(40.dp),
+                            Icon(
+                                modifier = Modifier.size(40.dp),
                                 painter = painterResource(
-                                    if (currentRoute == it.name) it.selectedIconId
-                                    else it.unselectedIconId
+                                    if (selected) destination.selectedIconId
+                                    else destination.unselectedIconId
                                 ),
-                                contentDescription = stringResource(id = it.iconTextId)
+                                contentDescription = stringResource(id = destination.iconTextId)
                             )
                         },
-//                        label = {
-//                            Text(
-////                                color = MaterialTheme.colorScheme.surfaceTint,
-//                                text = stringResource(id = it.titleTextId),
-//                                fontSize = 12.sp,
-//                            )
-//                        },
-//                        alwaysShowLabel = false,
                         colors = NavigationBarItemDefaults.colors(
                             indicatorColor = Color.Transparent,
                             selectedIconColor = MaterialTheme.colorScheme.onSurface,
                             unselectedIconColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-//                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
-//                            unselectedTextColor = MaterialTheme.colorScheme.onSurface,
                         )
                     )
                 }
             }
-        }
-    ) { paddingValues ->
-//    val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-//        val statusBarPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-//        Box(
-//            modifier = Modifier.paint(
-//                painterResource(id = R.drawable.sky_wallpaper),
-//                contentScale = ContentScale.FillBounds
-//            )
-//        )
+        },
+        snackbarHost = { SnackbarHost(snackBarHostState) },
+    ) { padding ->
 
-        NavHost(
-            navController = navController,
-            startDestination = TopLevelDestination.Weather.name,
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .consumeWindowInsets(padding)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Horizontal,
+                    ),
+                ),
         ) {
-            composable(TopLevelDestination.Weather.name) {
-                WeatherRoute(
-                    onLocationClick = onLocationClick,
-                    modifier = Modifier.padding(paddingValues)
+            val destination = appState.currentTopLevelDestination
+            val shouldShowTopAppBar = destination != null
+            if (destination != null) {
+                WeatherTopAppBar(
+                    titleRes = destination.iconTextId,
+                    navigationIcon = Icons.Rounded.Search,
+                    navigationIconContentDescription = stringResource(
+                        id = R.string.title_search,
+                    ),
+                    actionIcon = Icons.Rounded.LocationOn,
+                    actionIconContentDescription = stringResource(
+                        id = R.string.title_search,
+                    ),
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent,
+                    ),
+                    onActionClick = { onLocationClick() },
+                    onNavigationClick = { appState.navigateToSearch() },
                 )
             }
 
-            composable(TopLevelDestination.Favorites.name) {
-                FavoritesRoute(
-                    modifier = Modifier.padding(paddingValues),
-                    navController = navController
-                )
-            }
-
-            composable(TopLevelDestination.Settings.name) {
-                SettingsRoute(
-                    modifier = Modifier.padding(paddingValues)
-                )
+            Box(
+                modifier = Modifier.consumeWindowInsets(
+                    if (shouldShowTopAppBar) {
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
+                    } else {
+                        WindowInsets(0, 0, 0, 0)
+                    },
+                ),
+            ) {
+                AppNavHost(appState = appState)
             }
         }
     }
 }
+
+private fun NavDestination?.isTopLevelDestinationInHierarchy(destination: TopLevelDestination) =
+    this?.hierarchy?.any {
+        it.route?.contains(destination.name, true) ?: false
+    } ?: false

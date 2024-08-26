@@ -24,7 +24,7 @@ class SettingsRepository @Inject constructor(
     private val prefLanguage by lazy { stringPreferencesKey(KEY_LANGUAGE) }
     private val prefUnits by lazy { stringPreferencesKey(KEY_UNITS) }
     private val prefCoordinates by lazy { stringPreferencesKey(KEY_COORDINATES) }
-    private val prefDarkThemeConfig by lazy { stringPreferencesKey(KEY_COORDINATES) }
+    private val prefDarkThemeConfig by lazy { stringPreferencesKey(KEY_DARK_THEM_CONFIG) }
 
     suspend fun setLanguage(language: SupportedLanguage) {
         context.dataStoreLanguage.edit { it[prefLanguage] = language.name }
