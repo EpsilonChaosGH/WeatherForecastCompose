@@ -1,5 +1,6 @@
 package com.example.weatherforecastcompose.ui.screens.search
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +31,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -71,6 +74,22 @@ internal fun SearchRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     uiState.navigateToWeatherScreen.get()?.let { onSearchClick() }
+
+    LaunchedEffect(key1 = uiState) {
+        Log.e("aaa","LAUNCH")
+    }
+
+    DisposableEffect(key1 = uiState) {
+        Log.e("aaa","DISPOSE")
+        onDispose {
+            Log.e("aaa","ON DISPOSE")
+        }
+    }
+
+    SideEffect {
+        Log.e("aaa","SIDE")
+    }
+
 
     SearchScreen(
         uiState = uiState,

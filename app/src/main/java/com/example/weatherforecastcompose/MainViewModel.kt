@@ -30,8 +30,8 @@ class MainViewModel @Inject constructor(
 
     init {
         settings.getDarkThemConfig()
-            .onEach { searchQueries ->
-                setState { copy(darkThemeConfig = searchQueries) }
+            .onEach { darkThemeConfig ->
+                setState { copy(darkThemeConfig = darkThemeConfig) }
             }
             .stateIn(
                 scope = viewModelScope,
@@ -55,9 +55,7 @@ class MainViewModel @Inject constructor(
     private fun setCoordinatesAndNavigate(coordinates: Coordinates) {
         viewModelScope.launch {
             settings.setCoordinates(coordinates)
-            setState {
-                copy(navigateToWeatherScreen = AppSideEffect(Unit))
-            }
+            setState { copy(navigateToWeatherScreen = AppSideEffect(Unit)) }
         }
     }
 
