@@ -1,12 +1,14 @@
 <resources>
-    <string name="app_name">WeatherForecastCompose</string>
-
-    <string name="weather_icon_text">Weather</string>
-    <string name="favorites_icon_text">Favorites</string>
-    <string name="settings_icon_text">Settings</string>
+    <string name="app_name">Weather Forecast Compose</string>
 
 
-    <!--    Image content Description-->
+    <!-- Top level destinations-->
+    <string name="icon_text_weather">Weather</string>
+    <string name="icon_text_favorites">Favorites</string>
+    <string name="icon_text_settings">Settings</string>
+
+
+    <!-- Image content Description-->
     <string name="image_content_description_city">City</string>
     <string name="image_content_description_date">Date</string>
     <string name="image_content_description_is_favorite">Favorite</string>
@@ -18,29 +20,26 @@
     <string name="image_content_description_back_button">Back button</string>
 
 
+    <!-- Titles -->
     <string name="title_search">Search</string>
     <string name="title_loading">Loading</string>
-
     <string name="title_feels_like">Feels like</string>
     <string name="title_humidity">Humidity</string>
     <string name="title_pressure">Pressure</string>
     <string name="title_wind_speed">Wind speed</string>
-
     <string name="title_no2">NO2:</string>
     <string name="title_pm25">PM25:</string>
     <string name="title_pm10">PM10:</string>
     <string name="title_o3">O3:</string>
-
     <string name="title_language">Language:</string>
     <string name="title_units">Units:</string>
     <string name="title_dark_mode">Dark mode:</string>
-
     <string name="title_recent_searches">Recent searches</string>
-
     <string name="bt_save">Save</string>
     <string name="bt_clear_recent_searches">Clear searches</string>
 
-    <!--    Permissions-->
+
+    <!-- Permissions-->
     <string name="location_rationale_title">Permission Request</string>
     <string name="location_rationale_description">Hey there, we need location permission to show you relevant / accurate weather information.</string>
     <string name="location_rationale_button_grant">Allow</string>
@@ -48,6 +47,8 @@
     <string name="location_no_permission_screen_description">You need to grant location access to use the app</string>
     <string name="location_settings_not_enabled">Check your location settings and enable them</string>
 
+
+    <!-- Errors -->
     <string name="error_client">Oops,something fishy is up on your end :)</string>
     <string name="error_server">Oops! Something is wrong on our end :(</string>
     <string name="error_generic">Something is happening that\'s disturbing the force :(</string>
@@ -59,12 +60,12 @@
 
 
     <!-- Air quality -->
-    <string name="good">Good</string>
-    <string name="fair">Fair</string>
-    <string name="moderate">Moderate</string>
-    <string name="poor">Poor</string>
-    <string name="very_poor">Very poor</string>
-    <string name="error">Error</string>
+    <string name="air_quality_good">Good</string>
+    <string name="air_quality_fair">Fair</string>
+    <string name="air_quality_moderate">Moderate</string>
+    <string name="air_quality_poor">Poor</string>
+    <string name="air_quality_very_poor">Very poor</string>
+    <string name="air_quality_error">Error</string>
 
 
     <!-- Weather icons -->

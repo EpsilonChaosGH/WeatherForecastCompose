@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.weatherforecastcompose.designsystem.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,17 +68,18 @@ fun WeatherTopAppBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview("Top App Bar")
+@ThemePreviews
 @Composable
 private fun TopAppBarPreview() {
     AppTheme {
-        WeatherTopAppBar(
-            titleRes = android.R.string.untitled,
-            navigationIcon = Icons.Rounded.Search,
-            navigationIconContentDescription = "Navigation icon",
-            actionIcon = Icons.Rounded.MoreVert,
-            actionIconContentDescription = "Action icon",
-        )
+        AppBackground {
+            WeatherTopAppBar(
+                titleRes = android.R.string.untitled,
+                navigationIcon = Icons.Rounded.Search,
+                navigationIconContentDescription = "Navigation icon",
+                actionIcon = Icons.Rounded.LocationOn,
+                actionIconContentDescription = "Action icon",
+            )
+        }
     }
 }

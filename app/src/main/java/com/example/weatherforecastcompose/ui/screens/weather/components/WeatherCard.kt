@@ -78,7 +78,7 @@ internal fun WeatherCard(
                     Spacer(modifier = Modifier.width(AppTheme.dimens.extraSmall))
                     Text(
                         text = currentWeather.data,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleSmall
                     )
                 }
                 Row(Modifier.padding(top = AppTheme.dimens.small)) {

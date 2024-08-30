@@ -75,22 +75,6 @@ internal fun SearchRoute(
 
     uiState.navigateToWeatherScreen.get()?.let { onSearchClick() }
 
-    LaunchedEffect(key1 = uiState) {
-        Log.e("aaa","LAUNCH")
-    }
-
-    DisposableEffect(key1 = uiState) {
-        Log.e("aaa","DISPOSE")
-        onDispose {
-            Log.e("aaa","ON DISPOSE")
-        }
-    }
-
-    SideEffect {
-        Log.e("aaa","SIDE")
-    }
-
-
     SearchScreen(
         uiState = uiState,
         onAction = { action ->

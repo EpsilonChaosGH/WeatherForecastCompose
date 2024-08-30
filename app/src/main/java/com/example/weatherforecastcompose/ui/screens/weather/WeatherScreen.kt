@@ -138,7 +138,7 @@ internal fun WeatherContent(
         }
         item {
             Text(
-                text = "Air pollution:",
+                text = "Air pollution",
                 fontSize = 24.sp,
                 modifier = Modifier.padding(start = 22.dp, top = 22.dp)
             )
@@ -148,7 +148,7 @@ internal fun WeatherContent(
         }
         item {
             Text(
-                text = "Weather forecast:",
+                text = "Weather forecast",
                 fontSize = 24.sp,
                 modifier = Modifier.padding(start = 22.dp, top = 22.dp)
             )

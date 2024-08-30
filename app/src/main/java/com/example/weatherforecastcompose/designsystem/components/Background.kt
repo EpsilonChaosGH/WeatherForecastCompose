@@ -1,7 +1,6 @@
 package com.example.weatherforecastcompose.designsystem.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.Surface
@@ -18,11 +17,7 @@ fun AppBackground(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-//    val color = LocalBackgroundTheme.current.color
-//    val tonalElevation = LocalBackgroundTheme.current.tonalElevation
     Surface(
-//        color = if (color == Color.Unspecified) Color.Transparent else color,
-//        tonalElevation = if (tonalElevation == Dp.Unspecified) 0.dp else tonalElevation,
         modifier = modifier,
     ) {
         CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
