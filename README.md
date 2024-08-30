@@ -40,9 +40,9 @@ Check for one under  [`Api Keys`](https://home.openweathermap.org/api_keys)
 ### Features 📱
 
 <p align="center">
-<img src="screenshots/Screen_recording_weather.webm" width="32%" alt="weather"/>
-<img src="screenshots/Screen_recording_settings.webm" width="32%" alt="favorites"/>
-<img src="screenshots/Screen_recording_search_errors.webm" width="32%" alt="settings"/>
+<img src="screenshots/Screen_recording_weather.gif" width="32%" alt="weather"/>
+<img src="screenshots/Screen_recording_settings.gif" width="32%" alt="favorites"/>
+<img src="screenshots/Screen_recording_search_errors.gif" width="32%" alt="settings"/>
 </p>
 
 ### Libraries and tools 🔨
