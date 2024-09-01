@@ -5,16 +5,15 @@
 Weather Forecast Compose is a simple weather and air pollution forecast application that uses some
 APIs to get 3 day / 3 hour forecast data from [OpenWeatherMap](https://openweathermap.org/api).
 More info on how to make an api call [here](https://openweathermap.org/api/one-call-3#multi).
+It is possible to get the weather by searching or by current location, as well as change the language and units of temperature measurement.
 
 ### Pre-requisite 📝
 
-You need to create `apikeys.properties` and add your Open Weather API key.
+You need to create `apikeys.properties` and add your Open Weather [`Api Key`](https://home.openweathermap.org/api_keys).
 
 ```properties
-API_KEY=YOUR KEY
+API_KEY = "YOUR KEY"
 ```
-
-Check for one under  [`Api Keys`](https://home.openweathermap.org/api_keys)
 
 *Environment*
 
