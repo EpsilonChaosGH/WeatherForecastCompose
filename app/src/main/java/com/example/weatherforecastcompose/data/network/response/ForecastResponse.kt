@@ -1,12 +1,16 @@
 package com.example.weatherforecastcompose.data.network.response
 
-import com.squareup.moshi.Json
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ForecastResponse(
     val list: List<ListElement>,
     val city: City
 ) {
 
+    @Serializable
     data class City(
         val id: Long,
         val name: String,
@@ -15,11 +19,13 @@ data class ForecastResponse(
         val timezone: Long,
     )
 
+    @Serializable
     data class Coord(
         val lat: Double,
         val lon: Double
     )
 
+    @Serializable
     data class ListElement(
         val dt: Long,
         val main: MainClass,
@@ -27,26 +33,29 @@ data class ForecastResponse(
         val wind: Wind,
     )
 
+    @Serializable
     data class MainClass(
-        @field:Json(name = "temp")
+        @SerialName("temp")
         val temp: Double,
 
-        @field:Json(name = "feels_like")
+        @SerialName("feels_like")
         val feelsLike: Double,
 
-        @field:Json(name = "pressure")
+        @SerialName("pressure")
         val pressure: Long,
 
-        @field:Json(name = "humidity")
+        @SerialName("humidity")
         val humidity: Long,
     )
 
+    @Serializable
     data class Weather(
         val main: String,
         val description: String,
         val icon: String
     )
 
+    @Serializable
     data class Wind(
         val speed: Double,
     )

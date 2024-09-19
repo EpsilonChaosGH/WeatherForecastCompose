@@ -52,4 +52,5 @@ API_KEY = "YOUR KEY"
 * Hilt
 * Retrofit
 * OkHttp
-* Moshi
+* Kotlinx Serialization
+* KSP

@@ -8,16 +8,18 @@ import com.example.weatherforecastcompose.data.network.services.AirService
 import com.example.weatherforecastcompose.data.network.services.ForecastService
 import com.example.weatherforecastcompose.data.network.services.GeocodingService
 import com.example.weatherforecastcompose.data.network.services.WeatherService
-import com.squareup.moshi.Moshi
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -61,25 +63,28 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideMoshi(): Moshi {
-        return Moshi.Builder().build()
-    }
-
-    @Provides
-    @Singleton
     fun provideClient(interceptor: Interceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(interceptor)
+            .addInterceptor(
+                HttpLoggingInterceptor()
+                    .apply {
+                        if (BuildConfig.DEBUG) {
+                            setLevel(HttpLoggingInterceptor.Level.BODY)
+                        }
+                    },
+            )
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideRetrofit(client: OkHttpClient, moshi: Moshi): Retrofit {
+    fun provideRetrofit(client: OkHttpClient): Retrofit {
+        val networkJson = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
             .baseUrl("https://api.openweathermap.org/")
             .client(client)
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .addConverterFactory(networkJson.asConverterFactory("application/json".toMediaType()))
             .build()
     }
 
